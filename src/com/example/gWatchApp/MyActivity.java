@@ -1,18 +1,24 @@
 package com.example.gWatchApp;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
+import com.example.gWatchApp.bledriver.BleDeviceList;
+import com.example.gWatchApp.bledriver.BleDriver;
+
 
 public class MyActivity extends Activity implements View.OnClickListener
 {
-    private BleDriver   bleDriver;
-    private Button      scanButton;
-    private ListView    bleScannedDevicesList;
-    private BleDeviceList  bleDeviceList;
+    private BleDriver     bleDriver;
+    private Button        scanButton;
+    private Button        connectButton;
+    private ListView      bleScannedDevicesList;
+    private BleDeviceList bleDeviceList;
     /**
      * Called when the activity is first created.
      */
@@ -33,10 +39,34 @@ public class MyActivity extends Activity implements View.OnClickListener
         scanButton = (Button)findViewById(R.id.scanButton);
         scanButton.setOnClickListener(this);
 
+        connectButton = (Button)findViewById(R.id.connectButton);
+        connectButton.setOnClickListener(this);
+
         bleScannedDevicesList = (ListView)findViewById(R.id.bleScanList);
         bleScannedDevicesList.setAdapter(bleDeviceList);
+        bleScannedDevicesList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
+                if(bleDeviceList.chosenView != null)
+                {
+                    bleDeviceList.chosenView.setSelected(false);
+                    view.setBackgroundColor(Color.BLUE);
+                }
+                bleDeviceList.chosenView = view;
+                view.setBackgroundColor(Color.RED);
+                view.setSelected(true);
 
+            }
+        });
         bleDriver = new BleDriver(this, bleDeviceList);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
     }
 
     @Override
@@ -48,6 +78,33 @@ public class MyActivity extends Activity implements View.OnClickListener
             {
                 bleDeviceList.clear();
                 bleDriver.startScanning();
+                break;
+            }
+            case R.id.connectButton:
+            {
+                if(!bleDriver.isConnected())
+                {
+                    if (bleDeviceList.chosenView == null)
+                        return;
+                    TextView deviceMACAddress = (TextView) bleDeviceList.chosenView.findViewById(R.id.deviceMAC);
+
+                   BluetoothDevice chosenDevice = bleDriver.getBleAdapter().getRemoteDevice(String.valueOf
+                            (deviceMACAddress.getText()));
+
+                    bleDriver.connect(chosenDevice);
+                    connectButton.setText("Disconnect");
+                }
+                else
+                {
+                    bleDriver.disconnect();
+                    connectButton.setText("Connect");
+                }
+                break;
+            }
+            case R.id.bleScanList:
+            {
+
+
                 break;
             }
         }

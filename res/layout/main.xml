@@ -7,18 +7,42 @@
     <ListView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:id="@+id/bleScanList" android:layout_weight="0.9" android:choiceMode="singleChoice"/>
-    <LinearLayout
+            android:id="@+id/bleScanList" android:layout_weight="0.70" android:choiceMode="singleChoice"
+            android:clickable="true"/>
+    <RelativeLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="0dp" android:layout_gravity="center_horizontal"
-            android:layout_weight="0.1">
+            android:layout_height="0dp"
+            android:layout_weight="0.28">
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Connect"
+                android:id="@+id/connectButton" android:layout_gravity="right"
+                android:layout_marginLeft="486dp"
+                android:layout_alignParentTop="true" android:layout_alignParentEnd="true"/>
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Scan"
-                android:id="@+id/scanButton" android:layout_gravity="center_horizontal" android:background="#ff0d1496"
-                android:clickable="true" android:textColor="#fffffbfd"/>
-    </LinearLayout>
+                android:id="@+id/scanButton" android:layout_alignBaseline="@+id/connectButton"
+                android:layout_alignBottom="@+id/connectButton" android:layout_alignParentStart="true"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/txTextField" android:layout_below="@+id/connectButton"
+                android:layout_alignParentStart="true" android:layout_alignParentEnd="true"
+                />
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/rxTextField" android:layout_below="@+id/txTextField"
+                android:layout_alignParentStart="true" android:layout_alignParentBottom="true"
+                android:layout_alignEnd="@+id/connectButton"/>
+    </RelativeLayout>
 </LinearLayout>
 

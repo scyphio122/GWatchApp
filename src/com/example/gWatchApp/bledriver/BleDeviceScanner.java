@@ -1,22 +1,17 @@
-package com.example.gWatchApp;
+package com.example.gWatchApp.bledriver;
 
-import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
-import android.widget.ListAdapter;
 import android.widget.Toast;
-
+import com.example.gWatchApp.MyActivity;
 
 /**
  * Created by Konrad on 2016-01-06.
  */
 
 
-class DeviceScanActivity
+public class BleDeviceScanner
 {
     private BluetoothAdapter bleAdapter;
     private boolean scanning;
@@ -44,7 +39,7 @@ class DeviceScanActivity
         }
     };
 
-    DeviceScanActivity(BluetoothAdapter bleAdapter, BleDeviceList deviceListHandle, MyActivity activity)
+    BleDeviceScanner(BluetoothAdapter bleAdapter, BleDeviceList deviceListHandle, MyActivity activity)
     {
         this.bleAdapter = bleAdapter;
         this.leDeviceListAdapter = deviceListHandle;
@@ -79,42 +74,4 @@ class DeviceScanActivity
 
     }
 
-}
-
-public class BleDriver
-{
-    private BluetoothManager bleManager;
-    private BluetoothAdapter bleAdapter;
-    private DeviceScanActivity bleScan;
-    MyActivity activity;
-    public enum bleRequestEnum
-    {
-        REQUEST_BLE_DISABLED,
-        REQUEST_BLE_ENABLED
-    }
-
-    BleDriver(MyActivity activity, BleDeviceList deviceList)
-    {
-        bleManager = (BluetoothManager)activity.getSystemService(Context.BLUETOOTH_SERVICE);
-        bleAdapter = bleManager.getAdapter();
-        this.activity = activity;
-        /// Check if BLE is enabled
-        if(bleAdapter == null || !bleAdapter.isEnabled())
-        {
-            Intent enableBleIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBleIntent, 1);
-        }
-
-        bleScan = new DeviceScanActivity(bleAdapter, deviceList, activity);
-    }
-
-    public void startScanning()
-    {
-        bleScan.startScanning(true);
-    }
-
-    public void stopScanning()
-    {
-        bleScan.startScanning(false);
-    }
 }
