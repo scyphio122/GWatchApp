@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:baselineAligned="false" android:background="#ff0a1eff" android:weightSum="1" >
+    <ListView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/bleScanList" android:layout_weight="0.9" android:choiceMode="singleChoice"/>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" android:layout_gravity="center_horizontal"
+            android:layout_weight="0.1">
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scan"
+                android:id="@+id/scanButton" android:layout_gravity="center_horizontal" android:background="#ff0d1496"
+                android:clickable="true" android:textColor="#fffffbfd"/>
+    </LinearLayout>
+</LinearLayout>
+
