@@ -87,11 +87,11 @@ public class BleReceiver
                 bleDriver.bleTransmissionInProgress = true;
 
                 connection.writeDescriptor(indicateDescriptor);
-                this.bleDriver.getBleAdapter().getState();
+//                this.bleDriver.getBleAdapter().getState();
 //                bleDriver.bleTransmissionInProgress = true;
 //                while(bleDriver.bleTransmissionInProgress == true)
 //                {}
-                connection.writeDescriptor(notifyDescriptor);
+//                connection.writeDescriptor(notifyDescriptor);
 //                while(bleDriver.bleTransmissionInProgress == true)
 //                {}
                 Log.i(TAG, "Wysylam deskryptory");
@@ -100,6 +100,7 @@ public class BleReceiver
             case BluetoothHandler.ACTION_DATA_AVAILABLE:
             {
                 byte data[] = intent.getByteArrayExtra(BluetoothHandler.EXTRA_DATA);
+                bleDriver.receivedData(data);
                 break;
             }
         }

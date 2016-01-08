@@ -16,7 +16,7 @@ public class BleDeviceScanner
     private BluetoothAdapter bleAdapter;
     private boolean scanning;
     private final Handler handler = new Handler();
-    private static final short SCAN_PERIOD = 10000;
+    private static final short SCAN_PERIOD = 5000;
     private MyActivity activity;
     private BleDeviceList leDeviceListAdapter;
 

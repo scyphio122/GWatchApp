@@ -3,7 +3,10 @@ package com.example.gWatchApp.bledriver;
 import android.bluetooth.*;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.TextView;
 import com.example.gWatchApp.MyActivity;
+import com.example.gWatchApp.R;
+import org.apache.http.util.ByteArrayBuffer;
 
 
 public class BleDriver
@@ -111,5 +114,17 @@ public class BleDriver
     {
         writeChar.setValue(data);
         connection.writeCharacteristic(writeChar);
+        String text = new String(data);
+        activity.displayTransmitedData(text);
+    }
+
+    public void receivedData(byte[] data)
+    {
+        this.activity.displayReceivedData(new String(data));
+    }
+
+    public MyActivity getActivity()
+    {
+        return activity;
     }
 }

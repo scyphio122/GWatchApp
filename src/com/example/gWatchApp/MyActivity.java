@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.*;
 import com.example.gWatchApp.bledriver.BleDeviceList;
 import com.example.gWatchApp.bledriver.BleDriver;
+import org.w3c.dom.Text;
 
 
 public class MyActivity extends Activity implements View.OnClickListener
@@ -17,8 +18,12 @@ public class MyActivity extends Activity implements View.OnClickListener
     private BleDriver     bleDriver;
     private Button        scanButton;
     private Button        connectButton;
+    private Button        getSatsUsedButton;
     private ListView      bleScannedDevicesList;
     private BleDeviceList bleDeviceList;
+
+    private TextView      rxTextView;
+    private TextView      txTextView;
     /**
      * Called when the activity is first created.
      */
@@ -41,6 +46,12 @@ public class MyActivity extends Activity implements View.OnClickListener
 
         connectButton = (Button)findViewById(R.id.connectButton);
         connectButton.setOnClickListener(this);
+
+        getSatsUsedButton = (Button)findViewById(R.id.getSatsButton);
+        getSatsUsedButton.setOnClickListener(this);
+
+        rxTextView = (TextView)findViewById(R.id.rxTextField);
+        txTextView = (TextView)findViewById(R.id.txTextField);
 
         bleScannedDevicesList = (ListView)findViewById(R.id.bleScanList);
         bleScannedDevicesList.setAdapter(bleDeviceList);
@@ -101,6 +112,11 @@ public class MyActivity extends Activity implements View.OnClickListener
                 }
                 break;
             }
+            case R.id.getSatsButton:
+            {
+                bleDriver.sendData(new byte[]{12});
+                break;
+            }
             case R.id.bleScanList:
             {
 
@@ -123,5 +139,28 @@ public class MyActivity extends Activity implements View.OnClickListener
                 finish();
             }
         }
+    }
+
+    String parseHexToString(byte[] data)
+    {
+        StringBuilder sb = new StringBuilder(data.length);
+
+        for(int i=0; i < data.length; i++)
+        {
+            sb.append(String.format("0x%02X", data[i]));
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
+
+    public void displayReceivedData(String data)
+    {
+        this.rxTextView.setText(rxTextView.getText() + parseHexToString(data.getBytes()) + "\n\r");
+    }
+
+    public void displayTransmitedData(String data)
+    {
+        this.txTextView.setText(parseHexToString(data.getBytes()));
+        rxTextView.setText("");
     }
 }
