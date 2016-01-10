@@ -11,14 +11,13 @@ import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 
 public class BleDriver
 {
+    static byte msg_number = 0;
+
     private BluetoothManager bleManager;
     private BluetoothAdapter bleAdapter;
     private BleDeviceScanner bleScanner;
@@ -27,8 +26,11 @@ public class BleDriver
     private BluetoothHandler bleHandler;
     private BleDeviceList bleDevicesList;
     private MyActivity activity;
+
     public boolean bleTransmissionInProgress = false;
 
+    private ArrayList<String> text;
+    private static String currentText;
     BluetoothGattService service;
     BluetoothGattCharacteristic writeChar;
     BluetoothGattCharacteristic indicateChar;
@@ -57,6 +59,8 @@ public class BleDriver
 
         bleReceiver = new BleReceiver(this);
         bleHandler = new BluetoothHandler(bleReceiver, this);
+
+        text = new ArrayList<String>(0);
     }
 
     public void startScanning()
@@ -160,7 +164,7 @@ public class BleDriver
         TextView rxRawData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedRawDataTextField);
         TextView rxAsciiData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedASCIIDataTextFrame);
 
-        rxRawData.setText(rxRawData.getText() + parseHexToString(data) + " ");
+
 
         switch (data[0])
         {
@@ -168,12 +172,54 @@ public class BleDriver
             {
 
                 long timestamp = parseBytesInInt(data, 1);
-                String text = convertTimestampToHex(timestamp*1000);
+                text.add(convertTimestampToHex(timestamp*1000));
 
-                rxAsciiData.setText(rxAsciiData.getText() + text);
+//                rxAsciiData.setText(rxAsciiData.getText() + text);
+                break;
+            }
+            case 2:
+            {
+                switch (msg_number)
+                {
+                    case 0:
+                    {
+                        text.add(new String("Szerokość geograficzna:\n") + new String(data, 1, 3) + '°' + new
+                            String(data, 4, 2) + "." + new String(data, 6, 5));
+                        break;
+                    }
+                    case 1:
+                    {
+                        text.add(new String("Długość geograficzna:\n") + new String(data, 1, 3) + '°' + new
+                                String(data, 4, 2) + "." + new String(data, 6, 5));
+                        break;
+                    }
+                    case 2:
+                    {
+                        text.add(new String("Wysokość nad poziomem morza:\n") + new String(data, 1, data.length-1));
+                        msg_number = 0;
+                        break;
+                    }
+
+                }
+                msg_number++;
+
             }
         }
-    }
+        activity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if(text.size() != 0)
+                {
+                    currentText = String.copyValueOf(text.get(0).toCharArray());
+                    rxAsciiData.setText(rxAsciiData.getText() + currentText + "\n");
+                    rxRawData.setText(rxRawData.getText() + parseHexToString(data) + "\n");
+                    text.remove(0);
+                }
+            }
+        });
+}
 
     public MyActivity getActivity()
     {
