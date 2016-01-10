@@ -183,13 +183,13 @@ public class BleDriver
                 {
                     case 0:
                     {
-                        text.add(new String("Szerokość geograficzna:\n") + new String(data, 1, 3) + '°' + new
+                        text.add(new String("Szerokość geograficzna:\n") + new String(data, 1, 3) + "°" + new
                             String(data, 4, 2) + "." + new String(data, 6, 5));
                         break;
                     }
                     case 1:
                     {
-                        text.add(new String("Długość geograficzna:\n") + new String(data, 1, 3) + '°' + new
+                        text.add(new String("Długość geograficzna:\n") + new String(data, 1, 3) + "°" + new
                                 String(data, 4, 2) + "." + new String(data, 6, 5));
                         break;
                     }
@@ -199,21 +199,81 @@ public class BleDriver
                         msg_number = 0;
                         break;
                     }
-
                 }
                 msg_number++;
-
+                break;
             }
+            case 3:
+                return;
+            case 4:
+            {
+                if(data[1] == '0')
+                    text.add(new String("Brak fix'a pozycji"));
+                else
+                    text.add(new String("Fix pozycji OK"));
+                break;
+            }
+            case 5:
+            {
+                return;
+            }
+            case 6:
+            {
+                return;
+            }
+            case 7:
+            {
+                return;
+            }
+            case 8:
+            {
+                text.add(new String(data, 1, data.length-1));
+                break;
+            }
+            case 9:
+            {
+                if(data[1] == 0)
+                    text.add("Rozpoczęcie zapisu próbek - OK");
+                else if(data[1] == 8)
+                {
+                    text.add("Błąd rozpoczęcia zapisu próbek - zły stan");
+                }
+                break;
+            }
+            case 10:
+            {
+                if(data[1] == 0)
+                    text.add("Zakończenie zapisu próbek - OK");
+                else if(data[1] == 8)
+                {
+                    text.add("Błąd zakończenia zapisu próbek - zły stan");
+                }
+                break;
+            }
+            case 11:
+            {
+                if(data[1] == 0)
+                    text.add("Pamięć wyczyszczona - OK");
+                else
+                    text.add("Błąd czyszczenia pamięci");
+                break;
+            }
+            case 12:
+            {
+                text.add("Urządzenie komunikuje się z " + new String(data, 1, 1) + " satelitami");
+                break;
+            }
+
         }
+
         activity.runOnUiThread(new Runnable()
         {
             @Override
             public void run()
             {
-                if(text.size() != 0)
+                while(text.size() != 0)
                 {
-                    currentText = String.copyValueOf(text.get(0).toCharArray());
-                    rxAsciiData.setText(rxAsciiData.getText() + currentText + "\n");
+                    rxAsciiData.setText(rxAsciiData.getText() + text.get(0) + "\n");
                     rxRawData.setText(rxRawData.getText() + parseHexToString(data) + "\n");
                     text.remove(0);
                 }
