@@ -69,17 +69,7 @@ public class MyActivity extends FragmentActivity
     }
 
     /*
-    String parseHexToString(byte[] data)
-    {
-        StringBuilder sb = new StringBuilder(data.length);
 
-        for(int i=0; i < data.length; i++)
-        {
-            sb.append(String.format("0x%02X", data[i]));
-            sb.append(" ");
-        }
-        return sb.toString();
-    }
 
     public void displayReceivedData(String data)
     {

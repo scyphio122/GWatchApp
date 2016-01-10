@@ -10,6 +10,8 @@ import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
 import com.example.gWatchApp.fragments.ScanFragment;
 
+import java.util.TimeZone;
+
 /**
  * Created by Konrad on 2016-01-07.
  */
@@ -101,6 +103,7 @@ public class BluetoothHandler
                     Toast.makeText(act, "Services Discovered", Toast.LENGTH_SHORT).show();
                 }
             });
+
             if (status == BluetoothGatt.GATT_SUCCESS)
             {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);

@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 
 import java.util.LinkedList;
@@ -18,6 +19,8 @@ public class BleReceiver
     private BluetoothGatt connection;
     private BleDriver     bleDriver;
 
+    private static final Handler handler = new Handler();
+    private static final short DEV_TIME_UPDATE_DELAY = 500;
 
     private BluetoothGattService                service;
     private BluetoothGattCharacteristic         writeChar;
@@ -95,6 +98,19 @@ public class BleReceiver
 //                while(bleDriver.bleTransmissionInProgress == true)
 //                {}
                 Log.i(TAG, "Wysylam deskryptory");
+
+
+
+                final BleDriver temp = bleDriver;
+                handler.postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        temp.updateTimeOnDevice();
+                    }
+                }, DEV_TIME_UPDATE_DELAY);
+
                 break;
             }
             case BluetoothHandler.ACTION_DATA_AVAILABLE:
@@ -104,6 +120,7 @@ public class BleReceiver
                 break;
             }
         }
+
     }
 
     public void setConnection(BluetoothGatt connection)

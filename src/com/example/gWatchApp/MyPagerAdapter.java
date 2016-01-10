@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.example.gWatchApp.bledriver.BleDriver;
+import com.example.gWatchApp.fragments.DevOrdersFragment;
 import com.example.gWatchApp.fragments.ScanFragment;
 
 /**
@@ -39,8 +40,12 @@ public class MyPagerAdapter extends FragmentPagerAdapter
                 return fragment;
             }
 
-//                case 1:
-//                 return DeviceOrdersFragment.newInstance(1, "Device Orders", bleDriver);
+            case 1:
+            {
+                DevOrdersFragment fragment = DevOrdersFragment.newInstance(1, "Device Orders");
+                fragment.setBleDriver(driver);
+                return fragment;
+            }
 //
 //                case 2:
 //                    return ScanFragment.newInstance(2, )

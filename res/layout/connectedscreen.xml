@@ -6,7 +6,7 @@
               android:baselineAligned="true" android:background="#ff0a1eff" android:weightSum="1">
 
 
-    <ScrollView android:layout_width="wrap_content" android:layout_height="390dp" android:id="@+id/scrollView"
+    <ScrollView android:layout_width="wrap_content" android:layout_height="fill_parent" android:id="@+id/scrollView"
                 android:clickable="true">
         <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
                       android:layout_height="fill_parent">
@@ -48,28 +48,28 @@
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent" android:weightSum="1">
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Wysłano:"
-                android:id="@+id/sentTextFtield"/>
+                android:id="@+id/sentTextFtield" android:layout_weight="0.01"/>
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:id="@+id/sentDataTextField"/>
+                android:id="@+id/sentDataTextField" android:layout_weight="0.01"/>
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Odebrano:"
-                android:id="@+id/receivedTextFrame"/>
+                android:id="@+id/receivedTextFrame" android:layout_weight="0.02"/>
         <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="163dp"
-                android:id="@+id/scrollView2" android:layout_gravity="center_horizontal">
+                android:layout_height="wrap_content"
+                android:id="@+id/scrollView2" android:layout_gravity="center_horizontal" android:layout_weight="0.48">
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -78,8 +78,8 @@
         </ScrollView>
         <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/scrollView3" android:layout_gravity="center_horizontal">
+                android:layout_height="wrap_content"
+                android:id="@+id/scrollView3" android:layout_gravity="center_horizontal" android:layout_weight="0.48">
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
