@@ -164,7 +164,7 @@ public class BleDriver
         TextView rxRawData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedRawDataTextField);
         TextView rxAsciiData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedASCIIDataTextFrame);
 
-
+        text.add(parseHexToString(data));
 
         switch (data[0])
         {
@@ -273,8 +273,9 @@ public class BleDriver
             {
                 while(text.size() != 0)
                 {
+                    rxRawData.setText(rxRawData.getText() + text.get(0) + "\n");
+                    text.remove(0);
                     rxAsciiData.setText(rxAsciiData.getText() + text.get(0) + "\n");
-                    rxRawData.setText(rxRawData.getText() + parseHexToString(data) + "\n");
                     text.remove(0);
                 }
             }

@@ -10,6 +10,11 @@
                 android:clickable="true">
         <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
                       android:layout_height="fill_parent">
+            <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GPS On"
+                    android:id="@+id/gpsOnOffSwitch" android:checked="false"/>
             <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="Get Sats Used" android:id="@+id/satsUsedButton" android:layout_row="1"
                     android:layout_column="1"/>
