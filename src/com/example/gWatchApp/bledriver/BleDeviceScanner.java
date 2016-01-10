@@ -33,6 +33,7 @@ public class BleDeviceScanner
                 {
                     leDeviceListAdapter.add(bluetoothDevice);
                     leDeviceListAdapter.notifyDataSetChanged();
+                    scanning = false;
                 }
             });
 

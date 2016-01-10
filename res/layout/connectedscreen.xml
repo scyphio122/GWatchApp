@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:baselineAligned="true" android:background="#ff0a1eff" android:weightSum="1">
+
+
+    <ScrollView android:layout_width="wrap_content" android:layout_height="390dp" android:id="@+id/scrollView"
+                android:clickable="true">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+                      android:layout_height="fill_parent">
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Get Sats Used" android:id="@+id/satsUsedButton" android:layout_row="1"
+                    android:layout_column="1"/>
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Get GPS fix"
+                    android:id="@+id/gpsFixButton" android:layout_row="0" android:layout_column="1"/>
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Get GPS Pos"
+                    android:id="@+id/gpsPosButton" android:layout_row="1" android:layout_column="0"/>
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Start GPS Sampling" android:id="@+id/startGpsSamplingButton" android:layout_row="4"
+                    android:layout_column="1"/>
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Stop Sampling" android:id="@+id/stopSamplingButton" android:layout_row="5"
+                    android:layout_column="0" android:layout_weight="0.09"/>
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Get Track List" android:id="@+id/trackListButton" android:layout_row="3"
+                    android:layout_column="0"/>
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Get Track"
+                    android:id="@+id/getTrackButton" android:layout_row="2" android:layout_column="0"/>
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Get Bat Volt"
+                    android:id="@+id/batVoltButton" android:layout_row="4" android:layout_column="0"/>
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Clear Memory"
+                    android:id="@+id/clearMemButton" android:layout_weight="0.09" android:layout_row="5"
+                    android:layout_column="1"/>
+            <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Get Device Time"
+                    android:id="@+id/getDevTimeButton" android:layout_weight="0.09"/>
+            <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set Device Time"
+                    android:id="@+id/setDevTimeButton"/>
+        </LinearLayout>
+    </ScrollView>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Wysłano:"
+                android:id="@+id/sentTextFtield"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/sentDataTextField"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Odebrano:"
+                android:id="@+id/receivedTextFrame"/>
+        <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="163dp"
+                android:id="@+id/scrollView2" android:layout_gravity="center_horizontal">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:id="@+id/receivedASCIIDataTextFrame"/>
+        </ScrollView>
+        <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/scrollView3" android:layout_gravity="center_horizontal">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:id="@+id/receivedRawDataTextField"/>
+        </ScrollView>
+    </LinearLayout>
+</LinearLayout>

@@ -3,63 +3,21 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:baselineAligned="false" android:background="#ff0a1eff" android:weightSum="1" >
-    <ListView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:id="@+id/bleScanList" android:layout_weight="0.47" android:choiceMode="singleChoice"
-            android:clickable="true"/>
-    <RelativeLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.28">
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Connect"
-                android:id="@+id/connectButton" android:layout_gravity="right"
-                android:layout_marginLeft="486dp"
-                android:layout_alignParentTop="true" android:layout_alignParentEnd="true"/>
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Scan"
-                android:id="@+id/scanButton" android:layout_alignBaseline="@+id/connectButton"
-                android:layout_alignBottom="@+id/connectButton" android:layout_alignParentStart="true"/>
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:id="@+id/txTextField"
-                android:layout_below="@+id/textView" android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true" android:layout_above="@+id/textView2"/>
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Wysłane dane:"
-                android:id="@+id/textView"
-                android:layout_below="@+id/scanButton" android:layout_alignParentStart="true"/>
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Odebrane dane:"
-                android:id="@+id/textView2" android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"/>
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Get Sats Used"
-                android:id="@+id/getSatsButton" android:layout_alignParentTop="true" android:layout_centerHorizontal="true"/>
-    </RelativeLayout>
-    <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/rxTextField" android:layout_below="@+id/txTextField"
-            android:layout_alignParentStart="true" android:layout_alignParentBottom="true"
-            android:layout_alignEnd="@+id/connectButton" android:layout_weight="0.21"/>
-</LinearLayout>
+              android:baselineAligned="false" android:background="#ff0a1eff" android:weightSum="1"
+              android:id="@+id/mainTabWidget">
 
+    <android.support.v4.view.ViewPager
+            android:id="@+id/vpPager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <android.support.v4.view.PagerTabStrip
+                android:id="@+id/pager_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp" />
+
+    </android.support.v4.view.ViewPager>
+
+</LinearLayout>

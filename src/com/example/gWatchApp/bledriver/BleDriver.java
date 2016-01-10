@@ -3,10 +3,8 @@ package com.example.gWatchApp.bledriver;
 import android.bluetooth.*;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.TextView;
 import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
-import org.apache.http.util.ByteArrayBuffer;
 
 
 public class BleDriver
@@ -17,6 +15,7 @@ public class BleDriver
     private BluetoothGatt               connection;
     private BleReceiver                 bleReceiver;
     private BluetoothHandler            bleHandler;
+    private BleDeviceList               bleDevicesList;
     private MyActivity                  activity;
     public boolean                      bleTransmissionInProgress = false;
 
@@ -32,7 +31,7 @@ public class BleDriver
         REQUEST_BLE_ENABLED
     }
 
-    public BleDriver(MyActivity activity, BleDeviceList deviceList)
+    public BleDriver(MyActivity activity)
     {
         bleManager = (BluetoothManager)activity.getSystemService(Context.BLUETOOTH_SERVICE);
         bleAdapter = bleManager.getAdapter();
@@ -43,8 +42,8 @@ public class BleDriver
             Intent enableBleIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBleIntent, 1);
         }
-
-        bleScanner = new BleDeviceScanner(bleAdapter, deviceList, activity);
+        bleDevicesList = new BleDeviceList(activity, R.layout.ble_scan_device_element);
+        bleScanner = new BleDeviceScanner(bleAdapter, bleDevicesList, activity);
 
         bleReceiver = new BleReceiver(this);
         bleHandler = new BluetoothHandler(bleReceiver, this);
@@ -115,16 +114,21 @@ public class BleDriver
         writeChar.setValue(data);
         connection.writeCharacteristic(writeChar);
         String text = new String(data);
-        activity.displayTransmitedData(text);
+        //activity.displayTransmitedData(text);
     }
 
     public void receivedData(byte[] data)
     {
-        this.activity.displayReceivedData(new String(data));
+       // this.activity.displayReceivedData(new String(data));
     }
 
     public MyActivity getActivity()
     {
         return activity;
+    }
+
+    public BleDeviceList getBleDevicesList()
+    {
+        return bleDevicesList;
     }
 }

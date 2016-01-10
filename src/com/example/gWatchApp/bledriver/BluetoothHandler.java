@@ -1,8 +1,14 @@
 package com.example.gWatchApp.bledriver;
 
+import android.app.Activity;
 import android.bluetooth.*;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.Toast;
+import com.example.gWatchApp.MyActivity;
+import com.example.gWatchApp.R;
+import com.example.gWatchApp.fragments.ScanFragment;
 
 /**
  * Created by Konrad on 2016-01-07.
@@ -43,11 +49,23 @@ public class BluetoothHandler
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
         {
             String intentAction;
+            final MyActivity act = bleDriver.getActivity();
             if (newState == BluetoothProfile.STATE_CONNECTED)
             {
                 intentAction = ACTION_GATT_CONNECTED;
                 connectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
+
+                bleDriver.getActivity().runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Button b = (Button)act.getVpPager().findViewById(R.id.connectButton);
+                        b.setText("Disconnect");
+                        Toast.makeText(act, "Discovering services...", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
                 Log.i(TAG, "Connected to GATT server.");
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED)
@@ -55,6 +73,16 @@ public class BluetoothHandler
                 intentAction = ACTION_GATT_DISCONNECTED;
                 connectionState = STATE_DISCONNECTED;
                 connection.close();
+                bleDriver.getActivity().runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Button b = (Button)act.getVpPager().findViewById(R.id.connectButton);
+                        b.setText("Connect");
+                        Toast.makeText(act, "Disconnected", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 Log.i(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
@@ -64,6 +92,15 @@ public class BluetoothHandler
         public void onServicesDiscovered(BluetoothGatt gatt, int status)
         {
             Log.i(TAG, "Serwisy odkryte");
+            final MyActivity act = bleDriver.getActivity();
+            bleDriver.getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    Toast.makeText(act, "Services Discovered", Toast.LENGTH_SHORT).show();
+                }
+            });
             if (status == BluetoothGatt.GATT_SUCCESS)
             {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
