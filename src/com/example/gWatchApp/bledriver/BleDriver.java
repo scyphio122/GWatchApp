@@ -7,6 +7,8 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import com.example.gWatchApp.GpsSample;
+import com.example.gWatchApp.KlmCreator;
 import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
 
@@ -35,13 +37,17 @@ public class BleDriver
 
     public boolean bleTransmissionInProgress = false;
 
-    private ConcurrentLinkedQueue<String> text;
-    private ConcurrentLinkedQueue<String> rawData;
-
     BluetoothGattService service;
     BluetoothGattCharacteristic writeChar;
     BluetoothGattCharacteristic indicateChar;
     BluetoothGattCharacteristic notifyChar;
+
+    private ConcurrentLinkedQueue<String> text;
+    private ConcurrentLinkedQueue<String> rawData;
+
+    private LinkedList<GpsSample>  gpsSamples;
+    private GpsSample              currentGpsSample;
+    private KlmCreator             klmCreator;
 
 
     public enum bleRequestEnum
@@ -175,7 +181,6 @@ public class BleDriver
 
         rawData.add(parseHexToString(data) + "\n");
 
-        Log.i("Ble receiver", "Receiver called. Data Length: " + data.length);
         try
         {
         switch (data[0])
@@ -288,34 +293,7 @@ public class BleDriver
             e.printStackTrace();
         }
 
-        Log.i("Ble receiver", "Packet arrived: " + parseHexToString(data));
-
-        activity.runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Log.i("GUI thread", "GUI redrawed");
-                synchronized (text)
-                {
-                    while (text.size() != 0)
-                    {
-                        String txt = text.poll();
-                        if (txt != null)
-                            rxAsciiData.setText(rxAsciiData.getText() + txt + "\n");
-                    }
-                }
-                synchronized (rawData)
-                {
-                    while (rawData.size() != 0)
-                    {
-                        String raw = rawData.poll();
-                        if (raw != null)
-                            rxRawData.setText(rxRawData.getText() + raw + "\n");
-                    }
-                }
-            }
-        });
+        redrawGUI(rxAsciiData, rxRawData);
 }
 
     public MyActivity getActivity()
@@ -390,7 +368,6 @@ public class BleDriver
                 {
                     if(num > 0)
                     {
-                        Log.i("Get Track", "Odblokowuje przycisk getTrack.");
                         b.setEnabled(true);
                         n.setMinValue(1);
                         n.setMaxValue(num);
@@ -398,7 +375,6 @@ public class BleDriver
                     }
                     else
                     {
-                        Log.i("Get Track", "Blokuje przycisk getTrack.");
                         b.setEnabled(false);
                         n.setMinValue(0);
                         n.setValue(0);
@@ -430,28 +406,40 @@ public class BleDriver
             msg_total_bytes_number_to_receive = (int)parseBytesInInt(data, 1);
             msg_current_received_bytes_number = 0;
             text.add("Liczba bajtów do odebrania: " + parseBytesInShort(data, 1) + "\n");
+            gpsSamples = new LinkedList<GpsSample>();
         }
         else
         {
             if(msg_current_received_bytes_number < msg_total_bytes_number_to_receive)
             {
+                currentGpsSample = new GpsSample();
                 switch (s)
                 {
                     case 0:
                     {
                         msg_current_received_bytes_number += data.length - 1;
-                        text.add("Timestamp próbki: \n" + convertTimestampMillisToHex(parseBytesInInt(data, 1) * 1000)
-                        +"\n" +
-                                "Długość geograficzna: " + new String(data, 5, 3) + "°" + new String(data, 8, 2) + "."
-                                + new String(data, 10, 4) + "'" + new String(data, 14, 1));
+                        String longtitude = new String(data, 5, 3) + "°" + new String(data, 8, 2) + "."
+                                + new String(data, 10, 4) + "'" + new String(data, 14, 1);
+                        int timestamp = (int)parseBytesInInt(data, 1);
+
+                        currentGpsSample.setTimestamp(timestamp);
+                        currentGpsSample.setLongtitude(longtitude);
+
+                        text.add("Timestamp próbki: \n" + convertTimestampMillisToHex((long)timestamp * 1000)
+                        +"\n" + "Długość geograficzna: " + longtitude + "\n");
                         break;
                     }
                     case 1:
                     {
                         msg_current_received_bytes_number += data.length - 1;
+                        String latitude = new String(data, 1, 3) + "°" + new String(data, 4, 2) + "."
+                                + new String(data, 6, 4) + "'" + new String(data, 10, 1);
+
+                        currentGpsSample.setLatitude(latitude);
+                        gpsSamples.add(currentGpsSample);
+
                         rawData.add(parseHexToString(data));
-                        text.add("Szerokość geograficzna: " + new String(data, 1, 3) + "°" + new String(data, 4, 2) + "."
-                                + new String(data, 6, 4) + "'" + new String(data, 10, 1) + "\n");
+                        text.add("Szerokość geograficzna: " + latitude + "\n");
                         break;
                     }
                 }
@@ -467,11 +455,44 @@ public class BleDriver
                 if(msg_current_received_bytes_number >= msg_total_bytes_number_to_receive)
                 {
                     msg_number = 0;
+                    /// Create here KLM file
+                    klmCreator = new KlmCreator();
+                    klmCreator.setSamples(gpsSamples);
                 }
             }
         }
 
 
+    }
+
+    private void redrawGUI(TextView rxAsciiData, TextView rxRawData)
+    {
+        activity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Log.i("GUI thread", "GUI redrawed");
+                synchronized (text)
+                {
+                    while (text.size() != 0)
+                    {
+                        String txt = text.poll();
+                        if (txt != null)
+                            rxAsciiData.setText(rxAsciiData.getText() + txt + "\n");
+                    }
+                }
+                synchronized (rawData)
+                {
+                    while (rawData.size() != 0)
+                    {
+                        String raw = rawData.poll();
+                        if (raw != null)
+                            rxRawData.setText(rxRawData.getText() + raw + "\n");
+                    }
+                }
+            }
+        });
     }
 }
 
