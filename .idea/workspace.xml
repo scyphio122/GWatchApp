@@ -54,10 +54,11 @@
       <file leaf-file-name="BleDriver.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/example/gWatchApp/bledriver/BleDriver.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6829653">
-              <caret line="274" column="58" selection-start-line="274" selection-start-column="58" selection-end-line="274" selection-end-column="58" />
+            <state vertical-scroll-proportion="0.5899054">
+              <caret line="432" column="86" selection-start-line="432" selection-start-column="86" selection-end-line="432" selection-end-column="86" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#parseTrackList#0;class#BleDriver#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -87,7 +88,7 @@
         <entry file="file://$PROJECT_DIR$/src/com/example/gWatchApp/fragments/DevOrdersFragment.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="183" column="32" selection-start-line="183" selection-start-column="32" selection-end-line="183" selection-end-column="32" />
+              <caret line="182" column="28" selection-start-line="182" selection-start-column="28" selection-end-line="182" selection-end-column="28" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -666,12 +667,12 @@
       <workItem from="1452291905971" duration="10673000" />
       <workItem from="1452418743849" duration="34026000" />
       <workItem from="1452467386224" duration="9874000" />
-      <workItem from="1452520885418" duration="3565000" />
+      <workItem from="1452520885418" duration="13954000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="112452000" />
+    <option name="totallyTimeSpent" value="122841000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1928" y="-8" width="1936" height="1096" extended-state="6" />
@@ -726,14 +727,8 @@
           <properties />
           <option name="timeStamp" value="1" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/example/gWatchApp/bledriver/BleDriver.java</url>
-          <line>269</line>
-          <properties />
-          <option name="timeStamp" value="115" />
-        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="116" />
+      <option name="time" value="132" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -748,6 +743,7 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#parseTrackList#0;class#BleDriver#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1151,16 +1147,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/example/gWatchApp/fragments/DevOrdersFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="183" column="32" selection-start-line="183" selection-start-column="32" selection-end-line="183" selection-end-column="32" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/res/layout/connectedscreen.xml">
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1170,6 +1156,16 @@
       </provider>
       <provider selected="true" editor-type-id="android-designer">
         <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/example/gWatchApp/fragments/DevOrdersFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="182" column="28" selection-start-line="182" selection-start-column="28" selection-end-line="182" selection-end-column="28" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/example/gWatchApp/bledriver/BleReceiver.java">
@@ -1182,10 +1178,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/example/gWatchApp/bledriver/BleDriver.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6829653">
-          <caret line="274" column="58" selection-start-line="274" selection-start-column="58" selection-end-line="274" selection-end-column="58" />
+        <state vertical-scroll-proportion="0.5899054">
+          <caret line="432" column="86" selection-start-line="432" selection-start-column="86" selection-end-line="432" selection-end-column="86" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#parseTrackList#0;class#BleDriver#0" expanded="false" />
           </folding>
         </state>
       </provider>

@@ -177,9 +177,10 @@ public class DevOrdersFragment extends Fragment implements View.OnClickListener
             case R.id.getTrackButton:
             {
                 int trackNumber = trackNumberPicker.getValue();
-                byte []data = new byte[2];
+                byte []data = new byte[3];
                 data[0] = 0x05;
                 data[1] = (byte)trackNumber;
+                data[2] = 0;
 
                 bleDriver.sendData(data);
                 break;

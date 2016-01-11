@@ -10,20 +10,20 @@ import android.widget.TextView;
 import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
 
-import java.nio.ByteBuffer;
-import java.sql.Time;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 
 public class BleDriver
 {
     static int msg_number = 0;
+    int msg_total_bytes_number_to_receive = 0;
     int msg_number_to_receive = 0;
+    int msg_current_received_bytes_number = 0;
+
+
     private BluetoothManager bleManager;
     private BluetoothAdapter bleAdapter;
     private BleDeviceScanner bleScanner;
@@ -173,7 +173,7 @@ public class BleDriver
         TextView rxRawData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedRawDataTextField);
         TextView rxAsciiData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedASCIIDataTextFrame);
 
-        rawData.add(parseHexToString(data));
+        rawData.add(parseHexToString(data) + "\n");
 
         Log.i("Ble receiver", "Receiver called. Data Length: " + data.length);
         try
@@ -184,7 +184,7 @@ public class BleDriver
             {
 
                 long timestamp = parseBytesInInt(data, 1);
-                text.add("Czas urządzenia:\nhh:mm:ss DD-MM-YYYY\n" + convertTimestampToHex(timestamp*1000));
+                text.add("Czas urządzenia:\nhh:mm:ss DD-MM-YYYY\n" + convertTimestampMillisToHex(timestamp * 1000));
 
 //                rxAsciiData.setText(rxAsciiData.getText() + text);
                 break;
@@ -230,52 +230,12 @@ public class BleDriver
             }
             case 5:
             {
-                return;
+                parseTrack(data);
+                break;
             }
             case 6:
             {
-                if(msg_number == 0)
-                {
-                    msg_number_to_receive = data[1];
-                    text.add("Lista dostępnych tras zapisanych w pamięci urządzenia: " + Byte.toString(data[1]) + "\n");
-                    final Button b = (Button)activity.getVpPager().findViewById(R.id.getTrackButton);
-                    final NumberPicker n = (NumberPicker) activity.getVpPager().findViewById(R.id.trackNumberPicker);
-                    final byte num = data[1];
-                        activity.runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                if(num > 0)
-                                {
-                                    Log.i("Get Track", "Odblokowuje przycisk getTrack.");
-                                    b.setEnabled(true);
-                                    n.setMinValue(1);
-                                    n.setMaxValue(num);
-                                    n.setValue(1);
-                                }
-                                else
-                                {
-                                    Log.i("Get Track", "Blokuje przycisk getTrack.");
-                                    b.setEnabled(false);
-                                    n.setMinValue(0);
-                                    n.setValue(0);
-                                    n.setMaxValue(0);
-                                }
-                            }
-                        });
-                }
-                else
-                {
-                    text.add("Trasa nr " + Byte.toString(data[1]) + " ; Czas zapisu: \n" + "(hh:mm:ss DD-MM-YYYY)\n" +
-                            convertTimestampToHex
-                                    (parseBytesInInt(data, 2) * 1000));
-                }
-                msg_number++;
-                if(msg_number == msg_number_to_receive + 1)
-                {
-                    msg_number = 0;
-                }
+                parseTrackList(data);
                 break;
             }
             case 7:
@@ -383,17 +343,27 @@ public class BleDriver
 
     private long parseBytesInInt(byte[] bytes, int startOffset)
     {
-
         long timestamp = 0;
         for(int i = 0; i<4; i++)
         {
-            timestamp |= ((bytes[startOffset + i]) << (i * 8)) & (0x000000FF <<i*8);
+            timestamp |= ((bytes[startOffset + i]) << (i * 8)) & (0x000000FF << (i*8));
         }
         return timestamp;
     }
 
-    String convertTimestampToHex(long timestampMillis)
+    private int parseBytesInShort(byte[] bytes, int startOffset)
     {
+        int timestamp = 0;
+        for(int i = 0; i<2; i++)
+        {
+            timestamp |= ((bytes[startOffset + i]) << (i * 8)) & (0x000000FF <<(i*8));
+        }
+        return timestamp;
+    }
+
+    String convertTimestampMillisToHex(long timestampMillis_p)
+    {
+        long timestampMillis = timestampMillis_p;
         DateFormat sdf = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         TimeZone tz = TimeZone.getDefault();
@@ -403,6 +373,107 @@ public class BleDriver
 
         Date currentTime = (Date)c.getTime();
         return sdf.format(currentTime);
+    }
+
+    private void parseTrackList(byte data[])
+    {
+        if(msg_number == 0)
+        {
+            msg_number_to_receive = data[1];
+            text.add("Lista dostępnych tras zapisanych w pamięci urządzenia: " + Byte.toString(data[1]) + "\n");
+            final Button b = (Button)activity.getVpPager().findViewById(R.id.getTrackButton);
+            final NumberPicker n = (NumberPicker) activity.getVpPager().findViewById(R.id.trackNumberPicker);
+            final byte num = data[1];
+            activity.runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if(num > 0)
+                    {
+                        Log.i("Get Track", "Odblokowuje przycisk getTrack.");
+                        b.setEnabled(true);
+                        n.setMinValue(1);
+                        n.setMaxValue(num);
+                        n.setValue(1);
+                    }
+                    else
+                    {
+                        Log.i("Get Track", "Blokuje przycisk getTrack.");
+                        b.setEnabled(false);
+                        n.setMinValue(0);
+                        n.setValue(0);
+                        n.setMaxValue(0);
+                    }
+                }
+            });
+        }
+        else
+        {
+            text.add("Trasa nr " + Byte.toString(data[1]) + " ; Czas zapisu: \n" + "(hh:mm:ss DD-MM-YYYY)\n" +
+                    convertTimestampMillisToHex
+                            (parseBytesInInt(data, 2) * 1000));
+        }
+        msg_number++;
+        if(msg_number == msg_number_to_receive + 1)
+        {
+            msg_number = 0;
+        }
+    }
+
+    private void parseTrack(byte[] data)
+    {
+        msg_number++;
+        byte s = (byte)(msg_number % 2);
+        Log.i("Track", Byte.toString(s));
+        if(msg_number == 1)
+        {
+            msg_total_bytes_number_to_receive = (int)parseBytesInInt(data, 1);
+            msg_current_received_bytes_number = 0;
+            text.add("Liczba bajtów do odebrania: " + parseBytesInShort(data, 1) + "\n");
+        }
+        else
+        {
+            if(msg_current_received_bytes_number < msg_total_bytes_number_to_receive)
+            {
+                switch (s)
+                {
+                    case 0:
+                    {
+                        msg_current_received_bytes_number += data.length - 1;
+                        int timestamp = (int) parseBytesInInt(data, 1);
+                        Log.i("Track", "Timestamp: " + timestamp);
+                        text.add("Timestamp próbki: \n" + convertTimestampMillisToHex(timestamp * 1000) + "\n" +
+                                "Długość geograficzna: " + new String(data, 5, 3) + "°" + new String(data, 8, 2) + "."
+                                + new String(data, 10, 4) + "'" + new String(data, 14, 1));
+                        break;
+                    }
+                    case 1:
+                    {
+                        msg_current_received_bytes_number += data.length - 1;
+                        rawData.add(parseHexToString(data));
+                        text.add("Szerokość geograficzna: " + new String(data, 1, 3) + "°" + new String(data, 4, 2) + "."
+                                + new String(data, 6, 4) + "'" + new String(data, 10, 1) + "\n");
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                int ret_val = (int)parseBytesInInt(data, 1);
+                if(ret_val == 0)
+                    text.add("Trasa odebrana pomyślnie");
+                else
+                    text.add("Błąd odbioru trasy");
+
+                if(msg_current_received_bytes_number >= msg_total_bytes_number_to_receive)
+                {
+                    msg_number = 0;
+                }
+            }
+        }
+
+
     }
 }
 
