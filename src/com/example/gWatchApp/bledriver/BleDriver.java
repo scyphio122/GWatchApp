@@ -3,6 +3,7 @@ package com.example.gWatchApp.bledriver;
 import android.bluetooth.*;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.TextView;
 import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
@@ -12,12 +13,14 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 public class BleDriver
 {
-    static byte msg_number = 0;
-
+    static int msg_number = 0;
+    int msg_number_to_receive = 0;
     private BluetoothManager bleManager;
     private BluetoothAdapter bleAdapter;
     private BleDeviceScanner bleScanner;
@@ -29,8 +32,9 @@ public class BleDriver
 
     public boolean bleTransmissionInProgress = false;
 
-    private ArrayList<String> text;
-    private static String currentText;
+    private ConcurrentLinkedQueue<String> text;
+    private ConcurrentLinkedQueue<String> rawData;
+
     BluetoothGattService service;
     BluetoothGattCharacteristic writeChar;
     BluetoothGattCharacteristic indicateChar;
@@ -60,7 +64,9 @@ public class BleDriver
         bleReceiver = new BleReceiver(this);
         bleHandler = new BluetoothHandler(bleReceiver, this);
 
-        text = new ArrayList<String>(0);
+        text = new ConcurrentLinkedQueue<String>();
+        rawData = new ConcurrentLinkedQueue<String>();
+
     }
 
     public void startScanning()
@@ -164,8 +170,11 @@ public class BleDriver
         TextView rxRawData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedRawDataTextField);
         TextView rxAsciiData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedASCIIDataTextFrame);
 
-        text.add(parseHexToString(data));
+        rawData.add(parseHexToString(data));
 
+        Log.i("Ble receiver", "Receiver called. Data Length: " + data.length);
+        try
+        {
         switch (data[0])
         {
             case 1:
@@ -184,13 +193,16 @@ public class BleDriver
                     case 0:
                     {
                         text.add(new String("Szerokość geograficzna:\n") + new String(data, 1, 3) + "°" + new
-                            String(data, 4, 2) + "." + new String(data, 6, 5));
+                                String(data, 4, 2) + "." + new String(data, 6, 5));
+                        msg_number++;
                         break;
                     }
                     case 1:
                     {
+
                         text.add(new String("Długość geograficzna:\n") + new String(data, 1, 3) + "°" + new
                                 String(data, 4, 2) + "." + new String(data, 6, 5));
+                        msg_number++;
                         break;
                     }
                     case 2:
@@ -200,7 +212,7 @@ public class BleDriver
                         break;
                     }
                 }
-                msg_number++;
+
                 break;
             }
             case 3:
@@ -219,7 +231,22 @@ public class BleDriver
             }
             case 6:
             {
-                return;
+                if(msg_number == 0)
+                {
+                    msg_number_to_receive = data[2];
+                    text.add("Lista dostępnych tras zapisanych w pamięci urządzenia: \n");
+                }
+                else
+                {
+                    text.add("Trasa nr " + new String(data, 1, 1) + " ; Czas zapisu: " + convertTimestampToHex
+                            (parseBytesInInt(data, 2)*1000));
+                }
+                msg_number++;
+                if(msg_number == msg_number_to_receive)
+                {
+                    msg_number = 0;
+                }
+                break;
             }
             case 7:
             {
@@ -263,20 +290,38 @@ public class BleDriver
                 text.add("Urządzenie komunikuje się z " + new String(data, 1, 1) + " satelitami");
                 break;
             }
-
         }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Log.i("Ble receiver", "Packet arrived: " + parseHexToString(data));
 
         activity.runOnUiThread(new Runnable()
         {
             @Override
             public void run()
             {
-                while(text.size() != 0)
+                Log.i("GUI thread", "GUI redrawed");
+                synchronized (text)
                 {
-                    rxRawData.setText(rxRawData.getText() + text.get(0) + "\n");
-                    text.remove(0);
-                    rxAsciiData.setText(rxAsciiData.getText() + text.get(0) + "\n");
-                    text.remove(0);
+                    while (text.size() != 0)
+                    {
+                        String txt = text.poll();
+                        if (txt != null)
+                            rxAsciiData.setText(rxAsciiData.getText() + txt + "\n");
+                    }
+                }
+                synchronized (rawData)
+                {
+                    while (rawData.size() != 0)
+                    {
+                        String raw = rawData.poll();
+                        if (raw != null)
+                            rxRawData.setText(rxRawData.getText() + raw + "\n");
+                    }
                 }
             }
         });
