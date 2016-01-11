@@ -4,11 +4,14 @@ import android.bluetooth.*;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
 
 import java.nio.ByteBuffer;
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -181,7 +184,7 @@ public class BleDriver
             {
 
                 long timestamp = parseBytesInInt(data, 1);
-                text.add(convertTimestampToHex(timestamp*1000));
+                text.add("Czas urządzenia:\nhh:mm:ss DD-MM-YYYY\n" + convertTimestampToHex(timestamp*1000));
 
 //                rxAsciiData.setText(rxAsciiData.getText() + text);
                 break;
@@ -233,16 +236,43 @@ public class BleDriver
             {
                 if(msg_number == 0)
                 {
-                    msg_number_to_receive = data[2];
-                    text.add("Lista dostępnych tras zapisanych w pamięci urządzenia: \n");
+                    msg_number_to_receive = data[1];
+                    text.add("Lista dostępnych tras zapisanych w pamięci urządzenia: " + Byte.toString(data[1]) + "\n");
+                    final Button b = (Button)activity.getVpPager().findViewById(R.id.getTrackButton);
+                    final NumberPicker n = (NumberPicker) activity.getVpPager().findViewById(R.id.trackNumberPicker);
+                    final byte num = data[1];
+                        activity.runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                if(num > 0)
+                                {
+                                    Log.i("Get Track", "Odblokowuje przycisk getTrack.");
+                                    b.setEnabled(true);
+                                    n.setMinValue(1);
+                                    n.setMaxValue(num);
+                                    n.setValue(1);
+                                }
+                                else
+                                {
+                                    Log.i("Get Track", "Blokuje przycisk getTrack.");
+                                    b.setEnabled(false);
+                                    n.setMinValue(0);
+                                    n.setValue(0);
+                                    n.setMaxValue(0);
+                                }
+                            }
+                        });
                 }
                 else
                 {
-                    text.add("Trasa nr " + new String(data, 1, 1) + " ; Czas zapisu: " + convertTimestampToHex
-                            (parseBytesInInt(data, 2)*1000));
+                    text.add("Trasa nr " + Byte.toString(data[1]) + " ; Czas zapisu: \n" + "(hh:mm:ss DD-MM-YYYY)\n" +
+                            convertTimestampToHex
+                                    (parseBytesInInt(data, 2) * 1000));
                 }
                 msg_number++;
-                if(msg_number == msg_number_to_receive)
+                if(msg_number == msg_number_to_receive + 1)
                 {
                     msg_number = 0;
                 }
@@ -287,6 +317,8 @@ public class BleDriver
             }
             case 12:
             {
+                if(data[1] == 0)
+                    data[1] = '0';
                 text.add("Urządzenie komunikuje się z " + new String(data, 1, 1) + " satelitami");
                 break;
             }
@@ -349,25 +381,28 @@ public class BleDriver
         return sb.toString();
     }
 
-    private int parseBytesInInt(byte[] bytes, int startOffset)
+    private long parseBytesInInt(byte[] bytes, int startOffset)
     {
-        int timestamp = (bytes[startOffset]) |
-                (bytes[startOffset + 1] << 8) & 0x0000ff00 |
-                (bytes[startOffset + 2] << 16) & 0x00ff0000 |
-                (bytes[startOffset + 3] << 24) & 0xff000000;
+
+        long timestamp = 0;
+        for(int i = 0; i<4; i++)
+        {
+            timestamp |= ((bytes[startOffset + i]) << (i * 8)) & (0x000000FF <<i*8);
+        }
         return timestamp;
     }
 
     String convertTimestampToHex(long timestampMillis)
     {
         DateFormat sdf = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        TimeZone tz = TimeZone.getDefault();
+        int offset = tz.getRawOffset();
+        timestampMillis -= offset;
+        c.setTimeInMillis(timestampMillis);
 
-        timestampMillis = timestampMillis - TimeZone.getDefault().getRawOffset();
-        Date date = new Date(timestampMillis);
-
-        String text = "Czas urzadzenia to\n" +
-                 "(HH:MM:SS DD-MM-YYYY) :\n" + sdf.format(date) + "\n\n";
-        return text;
+        Date currentTime = (Date)c.getTime();
+        return sdf.format(currentTime);
     }
 }
 
