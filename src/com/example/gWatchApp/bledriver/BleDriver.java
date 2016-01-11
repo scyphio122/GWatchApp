@@ -182,7 +182,6 @@ public class BleDriver
         {
             case 1:
             {
-
                 long timestamp = parseBytesInInt(data, 1);
                 text.add("Czas urządzenia:\nhh:mm:ss DD-MM-YYYY\n" + convertTimestampMillisToHex(timestamp * 1000));
 
@@ -441,9 +440,8 @@ public class BleDriver
                     case 0:
                     {
                         msg_current_received_bytes_number += data.length - 1;
-                        int timestamp = (int) parseBytesInInt(data, 1);
-                        Log.i("Track", "Timestamp: " + timestamp);
-                        text.add("Timestamp próbki: \n" + convertTimestampMillisToHex(timestamp * 1000) + "\n" +
+                        text.add("Timestamp próbki: \n" + convertTimestampMillisToHex(parseBytesInInt(data, 1) * 1000)
+                        +"\n" +
                                 "Długość geograficzna: " + new String(data, 5, 3) + "°" + new String(data, 8, 2) + "."
                                 + new String(data, 10, 4) + "'" + new String(data, 14, 1));
                         break;
