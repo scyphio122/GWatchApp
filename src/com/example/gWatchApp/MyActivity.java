@@ -1,6 +1,7 @@
 package com.example.gWatchApp;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,8 +18,8 @@ public class MyActivity extends FragmentActivity
     private BleDriver               bleDriver;
     private FragmentPagerAdapter    adapterViewPager;
     private ViewPager               vpPager;
-    private ScanFragment            scanWindow;
-//    private DevOrdersFragment       devOrdersFragment;
+    private FragmentManager         fragmentManager;
+
     /**
      * Called when the activity is first created.
      */
@@ -32,7 +33,7 @@ public class MyActivity extends FragmentActivity
             Toast.makeText(this, "BLE NIE OBSLUGIWANE", Toast.LENGTH_SHORT).show();
             finish();
         }
-
+        fragmentManager = getFragmentManager();
         bleDriver = new BleDriver(this);
 
         vpPager = (ViewPager)findViewById(R.id.vpPager);

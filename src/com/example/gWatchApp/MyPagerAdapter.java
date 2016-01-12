@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.example.gWatchApp.bledriver.BleDriver;
 import com.example.gWatchApp.fragments.DevOrdersFragment;
+import com.example.gWatchApp.fragments.MapViewFragment;
 import com.example.gWatchApp.fragments.ScanFragment;
 
 /**
@@ -46,9 +47,9 @@ public class MyPagerAdapter extends FragmentPagerAdapter
                 fragment.setBleDriver(driver);
                 return fragment;
             }
-//
-//                case 2:
-//                    return ScanFragment.newInstance(2, )
+             case 2:
+                  MapViewFragment fragment = MapViewFragment.newInstance(2, "Mapa");
+                 return fragment;
             default:
                 return new Fragment();
         }
