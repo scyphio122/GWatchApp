@@ -14,6 +14,7 @@ import com.example.gWatchApp.R;
 import com.example.gWatchApp.fragments.MapViewFragment;
 import com.google.android.gms.maps.GoogleMap;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -428,11 +429,17 @@ public class BleDriver
                         String longtitude = new String(data, 5, 3) + "°" + new String(data, 8, 2) + "."
                                 + new String(data, 10, 4) + "'" + new String(data, 14, 1);
                         int timestamp = (int)parseBytesInInt(data, 1);
+                        String integer = longtitude.substring(0, 3);
+                        String fract = longtitude.substring(4, 6) + "." + longtitude
+                                .substring(7, 11);
+                        BigDecimal fract_bd = new BigDecimal(fract);
+                        double longtitude_d  = new BigDecimal(integer).doubleValue() + fract_bd.doubleValue()/60;
                         String temp = longtitude.substring(0, 3) + "."+ longtitude.substring(4, 6) + longtitude
                                 .substring
                                         (7, 11);
                         currentGpsSample.setTimestamp(timestamp);
-                        currentGpsSample.setLongtitude(Double.valueOf(temp).doubleValue());
+
+                        currentGpsSample.setLongtitude(longtitude_d);
 
                         text.add("Timestamp próbki: \n" + convertTimestampMillisToHex((long)timestamp * 1000)
                         +"\n" + "Długość geograficzna: " + longtitude + "\n");
@@ -445,9 +452,17 @@ public class BleDriver
                                 + new String(data, 6, 4) + "'" + new String(data, 10, 1);
                         String temp = latitude.substring(0, 3) + "." + latitude.substring(4, 6) + latitude.substring
                                 (7,11);
-                        currentGpsSample.setLatitude(Double.valueOf(temp).doubleValue());
+                        String integer = latitude.substring(0, 3);
+                        String fract = latitude.substring(4, 6) + "." + latitude
+                                .substring(7, 11);
+                        BigDecimal fract_bd = new BigDecimal(fract);
+                        double latitude_d = new BigDecimal(integer).doubleValue() + fract_bd.doubleValue()/60;
+                        BigDecimal v = new BigDecimal(temp);
+                        currentGpsSample.setLatitude(latitude_d );
                         gpsSamples.add(currentGpsSample);
-
+                        currentGpsSample = new GpsSample();
+                        Log.d("Probka GPS", "Lat: " + currentGpsSample.getLatitude() + "\nLong: " + currentGpsSample
+                                .getLongtitude());
                         rawData.add(parseHexToString(data));
                         text.add("Szerokość geograficzna: " + latitude + "\n");
                         break;
