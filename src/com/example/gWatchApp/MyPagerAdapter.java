@@ -49,6 +49,8 @@ public class MyPagerAdapter extends FragmentPagerAdapter
             }
              case 2:
                   MapViewFragment fragment = MapViewFragment.newInstance(2, "Mapa");
+                 fragment.setBleDriver(driver);
+                 driver.setMapViewFragment(fragment);
                  return fragment;
             default:
                 return new Fragment();

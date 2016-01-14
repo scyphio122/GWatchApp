@@ -112,7 +112,6 @@ public class DevOrdersFragment extends Fragment implements View.OnClickListener
                 if(b)
                 {
                     data[0] = 13;
-
                 }
                 else
                 {

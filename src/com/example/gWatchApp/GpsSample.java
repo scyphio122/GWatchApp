@@ -6,20 +6,20 @@ package com.example.gWatchApp;
 public class GpsSample
 {
     private int timestamp;
-    private String latitude;
-    private String longtitude;
+    private double latitude;
+    private double longtitude;
 
     public int getTimestamp()
     {
         return timestamp;
     }
 
-    public String getLatitude()
+    public double getLatitude()
     {
         return latitude;
     }
 
-    public String getLongtitude()
+    public double getLongtitude()
     {
         return longtitude;
     }
@@ -29,12 +29,12 @@ public class GpsSample
         this.timestamp = timestamp;
     }
 
-    public void setLatitude(String latitude)
+    public void setLatitude(double latitude)
     {
         this.latitude = latitude;
     }
 
-    public void setLongtitude(String longtitude)
+    public void setLongtitude(double longtitude)
     {
         this.longtitude = longtitude;
     }

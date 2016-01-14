@@ -37,6 +37,7 @@ public class MyActivity extends FragmentActivity
         bleDriver = new BleDriver(this);
 
         vpPager = (ViewPager)findViewById(R.id.vpPager);
+        vpPager.setOffscreenPageLimit(2);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager(), bleDriver);
         vpPager.setAdapter(adapterViewPager);
     }

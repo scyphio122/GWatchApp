@@ -11,6 +11,8 @@ import com.example.gWatchApp.GpsSample;
 import com.example.gWatchApp.KlmCreator;
 import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
+import com.example.gWatchApp.fragments.MapViewFragment;
+import com.google.android.gms.maps.GoogleMap;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,10 +39,10 @@ public class BleDriver
 
     public boolean bleTransmissionInProgress = false;
 
-    BluetoothGattService service;
-    BluetoothGattCharacteristic writeChar;
-    BluetoothGattCharacteristic indicateChar;
-    BluetoothGattCharacteristic notifyChar;
+    private BluetoothGattService service;
+    private BluetoothGattCharacteristic writeChar;
+    private BluetoothGattCharacteristic indicateChar;
+    private BluetoothGattCharacteristic notifyChar;
 
     private ConcurrentLinkedQueue<String> text;
     private ConcurrentLinkedQueue<String> rawData;
@@ -49,6 +51,8 @@ public class BleDriver
     private GpsSample              currentGpsSample;
     private KlmCreator             klmCreator;
 
+    private GoogleMap              map;
+    private MapViewFragment        mapViewFragment;
 
     public enum bleRequestEnum
     {
@@ -76,6 +80,7 @@ public class BleDriver
         text = new ConcurrentLinkedQueue<String>();
         rawData = new ConcurrentLinkedQueue<String>();
 
+        currentGpsSample = new GpsSample();
     }
 
     public void startScanning()
@@ -407,23 +412,27 @@ public class BleDriver
             msg_current_received_bytes_number = 0;
             text.add("Liczba bajtów do odebrania: " + parseBytesInShort(data, 1) + "\n");
             gpsSamples = new LinkedList<GpsSample>();
+            currentGpsSample = new GpsSample();
         }
         else
         {
             if(msg_current_received_bytes_number < msg_total_bytes_number_to_receive)
             {
-                currentGpsSample = new GpsSample();
+
                 switch (s)
                 {
                     case 0:
                     {
+
                         msg_current_received_bytes_number += data.length - 1;
                         String longtitude = new String(data, 5, 3) + "°" + new String(data, 8, 2) + "."
                                 + new String(data, 10, 4) + "'" + new String(data, 14, 1);
                         int timestamp = (int)parseBytesInInt(data, 1);
-
+                        String temp = longtitude.substring(0, 3) + "."+ longtitude.substring(4, 6) + longtitude
+                                .substring
+                                        (7, 11);
                         currentGpsSample.setTimestamp(timestamp);
-                        currentGpsSample.setLongtitude(longtitude);
+                        currentGpsSample.setLongtitude(Double.valueOf(temp).doubleValue());
 
                         text.add("Timestamp próbki: \n" + convertTimestampMillisToHex((long)timestamp * 1000)
                         +"\n" + "Długość geograficzna: " + longtitude + "\n");
@@ -434,8 +443,9 @@ public class BleDriver
                         msg_current_received_bytes_number += data.length - 1;
                         String latitude = new String(data, 1, 3) + "°" + new String(data, 4, 2) + "."
                                 + new String(data, 6, 4) + "'" + new String(data, 10, 1);
-
-                        currentGpsSample.setLatitude(latitude);
+                        String temp = latitude.substring(0, 3) + "." + latitude.substring(4, 6) + latitude.substring
+                                (7,11);
+                        currentGpsSample.setLatitude(Double.valueOf(temp).doubleValue());
                         gpsSamples.add(currentGpsSample);
 
                         rawData.add(parseHexToString(data));
@@ -448,7 +458,12 @@ public class BleDriver
             {
                 int ret_val = (int)parseBytesInInt(data, 1);
                 if(ret_val == 0)
+                {
                     text.add("Trasa odebrana pomyślnie");
+                    //disconnect();
+
+                    mapViewFragment.drawTrack(this.gpsSamples, this.map);
+                }
                 else
                     text.add("Błąd odbioru trasy");
 
@@ -493,6 +508,21 @@ public class BleDriver
                 }
             }
         });
+    }
+
+    public void setMap(GoogleMap map)
+    {
+        this.map = map;
+    }
+
+    public void setMapViewFragment(MapViewFragment mapViewFragment)
+    {
+        this.mapViewFragment = mapViewFragment;
+    }
+
+    public GoogleMap getMap()
+    {
+        return map;
     }
 }
 
