@@ -15,6 +15,8 @@ import com.example.gWatchApp.R;
 import com.example.gWatchApp.fragments.MapViewFragment;
 import com.google.android.gms.drive.internal.ac;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -208,16 +210,34 @@ public class BleDriver
                 {
                     case 0:
                     {
-                        text.add(new String("Szerokość geograficzna:\n") + new String(data, 1, 3) + "°" + new
-                                String(data, 4, 2) + "." + new String(data, 6, 5));
+                        String latitude = new String(data, 1, 3) + "°" + new String(data, 4, 2) + "." + new String
+                                (data, 6, 5);
+                        text.add(new String("Szerokość geograficzna:\n") + latitude);
+                        currentGpsSample = new GpsSample();
+                        String integer = latitude.substring(0, 3);
+                        String fract = latitude.substring(4, 6) + "." + latitude
+                                .substring(7, 11);
+                        BigDecimal fract_bd = new BigDecimal(fract);
+                        double longtitude_d  = new BigDecimal(integer).doubleValue() + fract_bd.doubleValue()/60;
+
+                        currentGpsSample.setLatitude(longtitude_d);
                         msg_number++;
                         break;
                     }
                     case 1:
                     {
+                        String longtitude = new String(data, 1, 3) + "°" + new
+                                String(data, 4, 2) + "." + new String(data, 6, 5);
+                        text.add(new String("Długość geograficzna:\n") + longtitude);
 
-                        text.add(new String("Długość geograficzna:\n") + new String(data, 1, 3) + "°" + new
-                                String(data, 4, 2) + "." + new String(data, 6, 5));
+                        String integer = longtitude.substring(0, 3);
+                        String fract = longtitude.substring(4, 6) + "." + longtitude
+                                .substring(7, 11);
+                        BigDecimal fract_bd = new BigDecimal(fract);
+                        double longtitude_d  = new BigDecimal(integer).doubleValue() + fract_bd.doubleValue()/60;
+
+                        currentGpsSample.setLongtitude(longtitude_d);
+
                         msg_number++;
                         break;
                     }
@@ -225,6 +245,16 @@ public class BleDriver
                     {
                         text.add(new String("Wysokość nad poziomem morza:\n") + new String(data, 1, data.length-1));
                         msg_number = 0;
+                        activity.runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                map.addMarker(new MarkerOptions().position(new LatLng(currentGpsSample.getLatitude(),
+                                        currentGpsSample.getLongtitude())));
+                            }
+                        });
+
                         break;
                     }
                 }
@@ -363,7 +393,8 @@ public class BleDriver
 
     private void parseTrackList(byte data[])
     {
-        if(msg_number == 0)
+        msg_number++;
+        if(msg_number == 1)
         {
             msg_number_to_receive = data[1];
             text.add("Lista dostępnych tras zapisanych w pamięci urządzenia: " + Byte.toString(data[1]) + "\n");
@@ -394,25 +425,32 @@ public class BleDriver
         }
         else
         {
-            text.add("Trasa nr " + Byte.toString(data[1]) + " ; Czas zapisu: \n" + "(hh:mm:ss DD-MM-YYYY)\n" +
-                    convertTimestampMillisToHex
-                            (parseBytesInInt(data, 2) * 1000));
-        }
-        msg_number++;
-        /// Ret val
-        if(msg_number == msg_number_to_receive + 1)
-        {
-            int retVal = 0;
-            parseBytesInInt(data, 1);
-            if(retVal == 0)
-                text.add("\nLista tras odebrana pomyślnie");
+            /// Ret val
+            if(msg_number == msg_number_to_receive + 1)
+            {
+                int retVal = 0;
+                parseBytesInInt(data, 1);
+                if(retVal == 0)
+                    text.add("\nLista tras odebrana pomyślnie");
+                else
+                    text.add("\nBłąd odbioru listy tras");
+            }
             else
-                text.add("\nBłąd odbioru listy tras");
+            if(msg_number == msg_number_to_receive + 2)
+            {
+                msg_number = 0;
+            }
+            else
+            {
+                text.add("Trasa nr " + Byte.toString(data[1]) + " ; Czas zapisu: \n" + "(hh:mm:ss DD-MM-YYYY)\n" +
+                        convertTimestampMillisToHex
+                                (parseBytesInInt(data, 2) * 1000));
+            }
         }
-        if(msg_number == msg_number_to_receive + 2)
-        {
-            msg_number = 0;
-        }
+
+
+
+
     }
 
     private void parseTrack(byte[] data)
