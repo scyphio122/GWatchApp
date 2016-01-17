@@ -1,6 +1,8 @@
 package com.example.gWatchApp.fragments;
 
 
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 
 import android.support.v4.app.Fragment;
@@ -16,6 +18,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.LinkedList;
 
@@ -57,18 +60,36 @@ public class MapViewFragment extends Fragment
         return mapViewFragment;
     }
 
-    public void drawTrack(final LinkedList<GpsSample> sampleList, final GoogleMap map)
+    private void drawTrack(final LinkedList<GpsSample> sampleList, final GoogleMap map)
+    {
+        if(sampleList.size() < 2)
+            return;
+        GpsSample   sample;
+        PolylineOptions options = new PolylineOptions();
+
+        options.color( Color.parseColor("#CC0000FF") );
+        options.width( 5 );
+        options.visible( true );
+        for ( int i=1; i<sampleList.size();i++ )
+        {
+            sample = sampleList.get(i);
+            map.addMarker(new MarkerOptions().position(new LatLng(sample.getLatitude(), sample.getLongtitude())));
+            options.add( new LatLng( sample.getLatitude(), sample.getLongtitude()));
+        }
+
+        map.addPolyline( options );
+
+
+    }
+    public void drawOnMap(final LinkedList<GpsSample> sampleList, final GoogleMap map)
     {
         bleDriver.getActivity().runOnUiThread(new Runnable()
         {
             @Override
             public void run()
             {
-                for(int i=0; i<sampleList.size();i++)
-                {
-                    GpsSample temp = sampleList.get(i);
-                    map.addMarker(new MarkerOptions().position(new LatLng(temp.getLatitude(), temp.getLongtitude())));
-                }
+                map.clear();
+                drawTrack(sampleList, map);
             }
         });
 

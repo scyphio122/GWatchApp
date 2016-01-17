@@ -490,7 +490,7 @@ public class BleDriver
                     text.add("Trasa odebrana pomyślnie");
                     //disconnect();
 
-                    mapViewFragment.drawTrack(this.gpsSamples, this.map);
+                    mapViewFragment.drawOnMap(this.gpsSamples, this.map);
                 }
                 else
                     text.add("Błąd odbioru trasy");
