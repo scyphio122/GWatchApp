@@ -122,9 +122,12 @@ public class DevOrdersFragment extends Fragment implements View.OnClickListener
             }
         });
 
+        this.disableButtons();
 
         return view;
     }
+
+
 
     @Override
     public void onClick(View view)
@@ -224,6 +227,54 @@ public class DevOrdersFragment extends Fragment implements View.OnClickListener
                 bleDriver.sendData(data);
                 break;
             }
+        }
+    }
+
+    public void enableButtons()
+    {
+        clearMemoryButton.setEnabled(true);
+        getBatVoltButton.setEnabled(true);
+        getDeviceTimeButton.setEnabled(true);
+        getGpsFixButton.setEnabled(true);
+        getGpsPosButton.setEnabled(true);
+        getSatsUsedButton.setEnabled(true);
+        getTrackListButton.setEnabled(true);
+        setDeviceTimeButton.setEnabled(true);
+        startSamplingButton.setEnabled(true);
+        stopSamplingButton.setEnabled(true);
+        gpsOnOffSwitch.setEnabled(true);
+    }
+
+    public void disableButtons()
+    {
+        clearMemoryButton.setEnabled(false);
+        getBatVoltButton.setEnabled(false);
+        getDeviceTimeButton.setEnabled(false);
+        getGpsFixButton.setEnabled(false);
+        getGpsPosButton.setEnabled(false);
+        getSatsUsedButton.setEnabled(false);
+        getTrackButton.setEnabled(false);
+        getTrackListButton.setEnabled(false);
+        setDeviceTimeButton.setEnabled(false);
+        startSamplingButton.setEnabled(false);
+        stopSamplingButton.setEnabled(false);
+        trackNumberPicker.setMaxValue(0);
+        trackNumberPicker.setValue(0);
+        trackNumberPicker.setMinValue(0);
+        trackNumberPicker.setEnabled(false);
+        gpsOnOffSwitch.setEnabled(false);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser)
+    {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser)
+        {
+            if(bleDriver.isConnected())
+                this.enableButtons();
+            else
+                this.disableButtons();
         }
     }
 

@@ -121,6 +121,21 @@ public class ScanFragment extends Fragment implements View.OnClickListener
         }
     }
 
+//    @Override
+//    public void setUserVisibleHint(boolean isVisibleToUser)
+//    {
+//        super.setUserVisibleHint(isVisibleToUser);
+//        if(bleDriver != null)
+//        {
+//            if (!bleDriver.isConnected())
+//            {
+//                connectButton.setText("Connect");
+//                connectButton.setEnabled(false);
+//            }
+//        }
+//
+//    }
+
     public void setBleDriver(BleDriver bleDriver)
     {
         this.bleDriver = bleDriver;

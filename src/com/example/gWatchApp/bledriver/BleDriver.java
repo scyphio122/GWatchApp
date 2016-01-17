@@ -7,11 +7,13 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.example.gWatchApp.GpsSample;
 import com.example.gWatchApp.KlmCreator;
 import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
 import com.example.gWatchApp.fragments.MapViewFragment;
+import com.google.android.gms.drive.internal.ac;
 import com.google.android.gms.maps.GoogleMap;
 
 import java.math.BigDecimal;
@@ -96,6 +98,7 @@ public class BleDriver
 
     public void connect(BluetoothDevice device)
     {
+        Toast.makeText(activity, "Connecting...", Toast.LENGTH_SHORT).show();
         connection = device.connectGatt(activity, false, bleHandler.gattCallback);
         bleReceiver.setConnection(this.connection);
         bleHandler.setConnection(this.connection);
@@ -155,8 +158,8 @@ public class BleDriver
         TextView rxRawData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedRawDataTextField);
         TextView rxAsciiData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedASCIIDataTextFrame);
 
-        rxAsciiData.setText(" ");
-        rxRawData.setText(" ");
+        rxAsciiData.setText("");
+        rxRawData.setText("");
     }
 
     public void updateTimeOnDevice()
@@ -372,7 +375,7 @@ public class BleDriver
                 @Override
                 public void run()
                 {
-                    if(num > 0)
+                    if(num > 0 && num != 0xFFFF)
                     {
                         b.setEnabled(true);
                         n.setMinValue(1);
@@ -396,7 +399,17 @@ public class BleDriver
                             (parseBytesInInt(data, 2) * 1000));
         }
         msg_number++;
+        /// Ret val
         if(msg_number == msg_number_to_receive + 1)
+        {
+            int retVal = 0;
+            parseBytesInInt(data, 1);
+            if(retVal == 0)
+                text.add("\nLista tras odebrana pomyślnie");
+            else
+                text.add("\nBłąd odbioru listy tras");
+        }
+        if(msg_number == msg_number_to_receive + 2)
         {
             msg_number = 0;
         }

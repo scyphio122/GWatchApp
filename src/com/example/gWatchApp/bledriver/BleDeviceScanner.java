@@ -16,7 +16,7 @@ public class BleDeviceScanner
     private BluetoothAdapter bleAdapter;
     private boolean scanning;
     private final Handler handler = new Handler();
-    private static final short SCAN_PERIOD = 5000;
+    private static final short SCAN_PERIOD = 10000;
     private MyActivity activity;
     private BleDeviceList leDeviceListAdapter;
 
@@ -28,12 +28,31 @@ public class BleDeviceScanner
         {
             activity.runOnUiThread(new Runnable()
             {
+                boolean newDevice = true;
                 @Override
                 public void run()
                 {
-                    leDeviceListAdapter.add(bluetoothDevice);
-                    leDeviceListAdapter.notifyDataSetChanged();
-                    scanning = false;
+                    /// Check if the device does not already exist on the list
+                    for(int i=0; i<leDeviceListAdapter.getCount(); i++)
+                    {
+                        if(leDeviceListAdapter.getItem(i).getAddress().equals(bluetoothDevice.getAddress()))
+                        {
+                            newDevice = false;
+                            break;
+                        }
+                        else
+                        {
+                            newDevice = true;
+                        }
+                    }
+                    /// If the device does not exist on the list, then add it
+                    if(newDevice)
+                    {
+                        leDeviceListAdapter.add(bluetoothDevice);
+                        leDeviceListAdapter.notifyDataSetChanged();
+                        scanning = false;
+                        Toast.makeText(activity, "Scanning finished.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
@@ -59,18 +78,20 @@ public class BleDeviceScanner
                   {
                       scanning = false;
                       bleAdapter.stopLeScan(leScanCallback);
-                      Toast.makeText(activity, "Nie znaleziono zadnego urzadzenia", Toast.LENGTH_SHORT).show();
+                      Toast.makeText(activity, "None device was found", Toast.LENGTH_SHORT).show();
                   }
               }
             }, SCAN_PERIOD);
 
             scanning = true;
             bleAdapter.startLeScan(leScanCallback);
+            Toast.makeText(activity, "Scanning...", Toast.LENGTH_SHORT).show();
         }
         else
         {
             scanning = false;
             bleAdapter.stopLeScan(leScanCallback);
+            Toast.makeText(activity, "Scanning...", Toast.LENGTH_SHORT).show();
         }
 
     }
