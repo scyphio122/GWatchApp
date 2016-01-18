@@ -51,7 +51,6 @@ public class BleDeviceScanner
                         leDeviceListAdapter.add(bluetoothDevice);
                         leDeviceListAdapter.notifyDataSetChanged();
                         scanning = false;
-                        Toast.makeText(activity, "Scanning finished.", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -78,7 +77,7 @@ public class BleDeviceScanner
                   {
                       scanning = false;
                       bleAdapter.stopLeScan(leScanCallback);
-                      Toast.makeText(activity, "None device was found", Toast.LENGTH_SHORT).show();
+                      Toast.makeText(activity, "Scan completed", Toast.LENGTH_SHORT).show();
                   }
               }
             }, SCAN_PERIOD);
@@ -91,7 +90,7 @@ public class BleDeviceScanner
         {
             scanning = false;
             bleAdapter.stopLeScan(leScanCallback);
-            Toast.makeText(activity, "Scanning...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Scan completed", Toast.LENGTH_SHORT).show();
         }
 
     }

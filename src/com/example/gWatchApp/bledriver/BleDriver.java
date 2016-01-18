@@ -4,10 +4,7 @@ import android.bluetooth.*;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.NumberPicker;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.example.gWatchApp.GpsSample;
 import com.example.gWatchApp.KlmCreator;
 import com.example.gWatchApp.MyActivity;
@@ -250,6 +247,7 @@ public class BleDriver
                             @Override
                             public void run()
                             {
+                                map.clear();
                                 map.addMarker(new MarkerOptions().position(new LatLng(currentGpsSample.getLatitude(),
                                         currentGpsSample.getLongtitude())));
                             }
@@ -334,7 +332,18 @@ public class BleDriver
 
         redrawGUI(rxAsciiData, rxRawData);
 }
-
+    public void notifiedData(byte[] data)
+    {
+        ToggleButton button = (ToggleButton) activity.findViewById(R.id.fixIndicatorButton);
+        if(data[0] == '1')
+        {
+            button.setChecked(true);
+        }
+        else
+        {
+            button.setChecked(false);
+        }
+    }
     public MyActivity getActivity()
     {
         return activity;
@@ -412,6 +421,7 @@ public class BleDriver
                         n.setMinValue(1);
                         n.setMaxValue(num);
                         n.setValue(1);
+                        n.setEnabled(true);
                     }
                     else
                     {
@@ -419,6 +429,7 @@ public class BleDriver
                         n.setMinValue(0);
                         n.setValue(0);
                         n.setMaxValue(0);
+                        n.setEnabled(false);
                     }
                 }
             });
@@ -426,7 +437,7 @@ public class BleDriver
         else
         {
             /// Ret val
-            if(msg_number == msg_number_to_receive + 1)
+            if(msg_number == msg_number_to_receive + 2)
             {
                 int retVal = 0;
                 parseBytesInInt(data, 1);
@@ -434,23 +445,15 @@ public class BleDriver
                     text.add("\nLista tras odebrana pomyślnie");
                 else
                     text.add("\nBłąd odbioru listy tras");
-            }
-            else
-            if(msg_number == msg_number_to_receive + 2)
-            {
                 msg_number = 0;
             }
             else
             {
                 text.add("Trasa nr " + Byte.toString(data[1]) + " ; Czas zapisu: \n" + "(hh:mm:ss DD-MM-YYYY)\n" +
                         convertTimestampMillisToHex
-                                (parseBytesInInt(data, 2) * 1000));
+                                (parseBytesInInt(data, 2) * 1000) +"\n");
             }
         }
-
-
-
-
     }
 
     private void parseTrack(byte[] data)
@@ -493,7 +496,7 @@ public class BleDriver
                         currentGpsSample.setLongtitude(longtitude_d);
 
                         text.add("Timestamp próbki: \n" + convertTimestampMillisToHex((long)timestamp * 1000)
-                        +"\n" + "Długość geograficzna: " + longtitude + "\n");
+                        +"\n" + "Długość geograficzna: " + longtitude);
                         break;
                     }
                     case 1:
@@ -589,6 +592,16 @@ public class BleDriver
     public GoogleMap getMap()
     {
         return map;
+    }
+
+    public BluetoothGattCharacteristic getIndicateChar()
+    {
+        return indicateChar;
+    }
+
+    public BluetoothGattCharacteristic getNotifyChar()
+    {
+        return notifyChar;
     }
 }
 

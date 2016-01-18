@@ -135,7 +135,7 @@ public class BluetoothHandler
     private void broadcastUpdate(final String action)
     {
         final Intent intent = new Intent(action);
-        bleReceiver.onReceive(intent);
+        bleReceiver.onReceive(null, intent);
     }
 
     private void broadcastUpdate(final String action,
@@ -144,11 +144,13 @@ public class BluetoothHandler
         final Intent intent = new Intent(action);
 
         final byte[] data = characteristic.getValue();
+
         if (data != null && data.length > 0)
         {
             intent.putExtra(EXTRA_DATA, data);
-            bleReceiver.onReceive(intent);
+            bleReceiver.onReceive(characteristic, intent);
         }
+
     }
 
     public void setConnection(BluetoothGatt connection)

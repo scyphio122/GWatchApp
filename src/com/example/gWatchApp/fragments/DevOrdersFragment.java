@@ -1,20 +1,14 @@
 package com.example.gWatchApp.fragments;
 
-import android.bluetooth.BluetoothDevice;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.example.gWatchApp.R;
-import com.example.gWatchApp.bledriver.BleDeviceList;
 import com.example.gWatchApp.bledriver.BleDriver;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -196,9 +190,12 @@ public class DevOrdersFragment extends Fragment implements View.OnClickListener
             }
             case R.id.clearMemButton:
             {
-                byte []data = new byte[1];
-                data[0] = 0x0B;
-                bleDriver.sendData(data);
+                ClearMemoryDialog dialog = new ClearMemoryDialog();
+                dialog.setBleDriver(bleDriver);
+                dialog.setActivity(getActivity());
+
+                dialog.showDialog();
+
                 break;
             }
             case R.id.getDevTimeButton:

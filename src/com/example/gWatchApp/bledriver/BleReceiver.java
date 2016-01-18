@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.util.LinkedList;
@@ -34,10 +35,10 @@ public class BleReceiver
         this.bleDriver = bleDriver;
     }
 
-    public void onReceive(Intent intent)
+    public void onReceive(BluetoothGattCharacteristic characteristic, Intent intent)
     {
         final String action = intent.getAction();
-        switch(action)
+        switch (action)
         {
             case BluetoothHandler.ACTION_GATT_CONNECTED:
             {
@@ -68,9 +69,9 @@ public class BleReceiver
                 bleDriver.setNotifyChar(notifyChar);
 
                 BluetoothGattDescriptor indicateDescriptor = indicateChar.getDescriptor(UUID.fromString
-                    ("00002902-0000-1000-8000-00805f9b34fb"));
+                        ("00002902-0000-1000-8000-00805f9b34fb"));
                 BluetoothGattDescriptor notifyDescriptor = notifyChar.getDescriptor(UUID.fromString
-                    ("00002902-0000-1000-8000-00805f9b34fb"));
+                        ("00002902-0000-1000-8000-00805f9b34fb"));
 
 
                 Log.i(TAG, "Sprawdzam wartosc indicateDescriptor");
@@ -97,8 +98,16 @@ public class BleReceiver
 //                connection.writeDescriptor(notifyDescriptor);
 //                while(bleDriver.bleTransmissionInProgress == true)
 //                {}
+                final BluetoothGatt con = connection;
+                handler.postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        con.writeDescriptor(notifyDescriptor);
+                    }
+                }, 1000);
                 Log.i(TAG, "Wysylam deskryptory");
-
 
 
                 final BleDriver temp = bleDriver;
@@ -116,11 +125,14 @@ public class BleReceiver
             case BluetoothHandler.ACTION_DATA_AVAILABLE:
             {
                 byte data[] = intent.getByteArrayExtra(BluetoothHandler.EXTRA_DATA);
-                bleDriver.receivedData(data);
+                if(characteristic == indicateChar)
+                    bleDriver.receivedData(data);
+                else
+                if(characteristic == notifyChar)
+                    bleDriver.notifiedData(data);
                 break;
             }
         }
-
     }
 
     public void setConnection(BluetoothGatt connection)
