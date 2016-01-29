@@ -99,12 +99,13 @@ public class BleReceiver
 //                while(bleDriver.bleTransmissionInProgress == true)
 //                {}
                 final BluetoothGatt con = connection;
+                final BluetoothGattDescriptor notif = notifyDescriptor;
                 handler.postDelayed(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        con.writeDescriptor(notifyDescriptor);
+                        con.writeDescriptor(notif);
                     }
                 }, 1000);
                 Log.i(TAG, "Wysylam deskryptory");

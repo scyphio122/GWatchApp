@@ -84,18 +84,18 @@
                           android:textOff="No GPS Fix" android:textOn="GPS fix" android:checked="false"/>
         </LinearLayout>
         <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Wysłano:"
                 android:id="@+id/sentTextFtield" android:layout_weight="0.01"/>
         <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/sentDataTextField" android:layout_weight="0.01"/>
         <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Odebrano:"
@@ -105,8 +105,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/scrollView2" android:layout_gravity="center_horizontal" android:layout_weight="0.48">
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:id="@+id/receivedASCIIDataTextFrame"/>
         </ScrollView>
@@ -115,8 +115,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/scrollView3" android:layout_gravity="center_horizontal" android:layout_weight="0.48">
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:id="@+id/receivedRawDataTextField"/>
         </ScrollView>

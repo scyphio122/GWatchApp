@@ -57,8 +57,8 @@ public class BleDriver
     private GoogleMap              map;
     private MapViewFragment        mapViewFragment;
 
-    String asciiText;
-    String rawText;
+    String asciiText = "";
+    String rawText = "";
 
     public enum bleRequestEnum
     {
@@ -88,6 +88,8 @@ public class BleDriver
 
         progressDialog= new ProgressDialog(getActivity());
         progressBarHandler = new Handler();
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setIndeterminate(false);
         currentGpsSample = new GpsSample();
     }
 
@@ -163,6 +165,8 @@ public class BleDriver
         TextView rxRawData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedRawDataTextField);
         TextView rxAsciiData = (TextView) this.activity.getVpPager().findViewById(R.id.receivedASCIIDataTextFrame);
 
+        asciiText = "";
+        rawText = "";
         rxAsciiData.setText("");
         rxRawData.setText("");
     }
@@ -349,14 +353,30 @@ public class BleDriver
 }
     public void notifiedData(byte[] data)
     {
-        ToggleButton button = (ToggleButton) activity.findViewById(R.id.fixIndicatorButton);
-        if(data[0] == '1')
+        final ToggleButton button = (ToggleButton) activity.findViewById(R.id.fixIndicatorButton);
+        if(data[1] == '0' || data[1] == 0)
         {
-            button.setChecked(true);
+            getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    button.setChecked(false);
+                }
+            });
+
         }
         else
         {
-            button.setChecked(false);
+            getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    button.setChecked(true);
+                }
+            });
+
         }
     }
     public MyActivity getActivity()
@@ -484,7 +504,7 @@ public class BleDriver
             currentGpsSample = new GpsSample();
 
             progressDialog.setProgress(0);
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+
             progressDialog.setMax(msg_total_bytes_number_to_receive);
             rawText = "";
             asciiText = "";
@@ -493,7 +513,7 @@ public class BleDriver
                 @Override
                 public void run()
                 {
-                    progressDialog = ProgressDialog.show(getActivity(), "Loading track track in progress", "Please wait for " +
+                    progressDialog = ProgressDialog.show(getActivity(), "Loading track in progress", "Please wait for " +
                             "a while");
                 }
             });
