@@ -1,16 +1,16 @@
 package com.example.gWatchApp.bledriver;
 
+import android.app.ProgressDialog;
 import android.bluetooth.*;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.os.Handler;
 import android.widget.*;
 import com.example.gWatchApp.GpsSample;
 import com.example.gWatchApp.KlmCreator;
 import com.example.gWatchApp.MyActivity;
 import com.example.gWatchApp.R;
 import com.example.gWatchApp.fragments.MapViewFragment;
-import com.google.android.gms.drive.internal.ac;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -51,10 +51,14 @@ public class BleDriver
 
     private LinkedList<GpsSample>  gpsSamples;
     private GpsSample              currentGpsSample;
-    private KlmCreator             klmCreator;
+    private ProgressDialog          progressDialog;
+    private Handler                 progressBarHandler;
 
     private GoogleMap              map;
     private MapViewFragment        mapViewFragment;
+
+    String asciiText;
+    String rawText;
 
     public enum bleRequestEnum
     {
@@ -82,17 +86,19 @@ public class BleDriver
         text = new ConcurrentLinkedQueue<String>();
         rawData = new ConcurrentLinkedQueue<String>();
 
+        progressDialog= new ProgressDialog(getActivity());
+        progressBarHandler = new Handler();
         currentGpsSample = new GpsSample();
     }
 
     public void startScanning()
     {
-        bleScanner.startScanning(true);
+        bleScanner.startStopScanning(true);
     }
 
     public void stopScanning()
     {
-        bleScanner.startScanning(false);
+        bleScanner.startStopScanning(false);
     }
 
     public void connect(BluetoothDevice device)
@@ -199,6 +205,7 @@ public class BleDriver
                 text.add("Czas urządzenia:\nhh:mm:ss DD-MM-YYYY\n" + convertTimestampMillisToHex(timestamp * 1000));
 
 //                rxAsciiData.setText(rxAsciiData.getText() + text);
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
             case 2:
@@ -236,6 +243,7 @@ public class BleDriver
                         currentGpsSample.setLongtitude(longtitude_d);
 
                         msg_number++;
+
                         break;
                     }
                     case 2:
@@ -252,7 +260,7 @@ public class BleDriver
                                         currentGpsSample.getLongtitude())));
                             }
                         });
-
+                        redrawGUI(rxAsciiData, rxRawData);
                         break;
                     }
                 }
@@ -267,6 +275,7 @@ public class BleDriver
                     text.add(new String("Brak fix'a pozycji"));
                 else
                     text.add(new String("Fix pozycji OK"));
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
             case 5:
@@ -277,6 +286,7 @@ public class BleDriver
             case 6:
             {
                 parseTrackList(data);
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
             case 7:
@@ -286,6 +296,7 @@ public class BleDriver
             case 8:
             {
                 text.add(new String(data, 1, data.length-1));
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
             case 9:
@@ -296,6 +307,7 @@ public class BleDriver
                 {
                     text.add("Błąd rozpoczęcia zapisu próbek - zły stan");
                 }
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
             case 10:
@@ -306,6 +318,7 @@ public class BleDriver
                 {
                     text.add("Błąd zakończenia zapisu próbek - zły stan");
                 }
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
             case 11:
@@ -314,6 +327,7 @@ public class BleDriver
                     text.add("Pamięć wyczyszczona - OK");
                 else
                     text.add("Błąd czyszczenia pamięci");
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
             case 12:
@@ -321,6 +335,7 @@ public class BleDriver
                 if(data[1] == 0)
                     data[1] = '0';
                 text.add("Urządzenie komunikuje się z " + new String(data, 1, 1) + " satelitami");
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
         }
@@ -330,7 +345,7 @@ public class BleDriver
             e.printStackTrace();
         }
 
-        redrawGUI(rxAsciiData, rxRawData);
+
 }
     public void notifiedData(byte[] data)
     {
@@ -460,7 +475,6 @@ public class BleDriver
     {
         msg_number++;
         byte s = (byte)(msg_number % 2);
-        Log.i("Track", Byte.toString(s));
         if(msg_number == 1)
         {
             msg_total_bytes_number_to_receive = (int)parseBytesInInt(data, 1);
@@ -468,17 +482,32 @@ public class BleDriver
             text.add("Liczba bajtów do odebrania: " + parseBytesInShort(data, 1) + "\n");
             gpsSamples = new LinkedList<GpsSample>();
             currentGpsSample = new GpsSample();
+
+            progressDialog.setProgress(0);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.setMax(msg_total_bytes_number_to_receive);
+            rawText = "";
+            asciiText = "";
+            getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    progressDialog = ProgressDialog.show(getActivity(), "Loading track track in progress", "Please wait for " +
+                            "a while");
+                }
+            });
+
+
         }
         else
         {
             if(msg_current_received_bytes_number < msg_total_bytes_number_to_receive)
             {
-
                 switch (s)
                 {
                     case 0:
                     {
-
                         msg_current_received_bytes_number += data.length - 1;
                         String longtitude = new String(data, 5, 3) + "°" + new String(data, 8, 2) + "."
                                 + new String(data, 10, 4) + "'" + new String(data, 14, 1);
@@ -515,9 +544,7 @@ public class BleDriver
                         currentGpsSample.setLatitude(latitude_d );
                         gpsSamples.add(currentGpsSample);
                         currentGpsSample = new GpsSample();
-                        Log.d("Probka GPS", "Lat: " + currentGpsSample.getLatitude() + "\nLong: " + currentGpsSample
-                                .getLongtitude());
-                        rawData.add(parseHexToString(data));
+//                        rawData.add(parseHexToString(data));
                         text.add("Szerokość geograficzna: " + latitude + "\n");
                         break;
                     }
@@ -529,8 +556,12 @@ public class BleDriver
                 if(ret_val == 0)
                 {
                     text.add("Trasa odebrana pomyślnie");
-                    //disconnect();
-
+                    progressDialog.dismiss();
+                    TextView rxAsciiData = (TextView)getActivity().getVpPager().findViewById(R.id
+                            .receivedASCIIDataTextFrame);
+                    TextView rxRawData = (TextView)getActivity().getVpPager().findViewById(R.id
+                            .receivedRawDataTextField);
+                    redrawGUI(rxAsciiData, rxRawData);
                     mapViewFragment.drawOnMap(this.gpsSamples, this.map);
                 }
                 else
@@ -539,11 +570,21 @@ public class BleDriver
                 if(msg_current_received_bytes_number >= msg_total_bytes_number_to_receive)
                 {
                     msg_number = 0;
-                    /// Create here KLM file
-                    klmCreator = new KlmCreator();
-                    klmCreator.setSamples(gpsSamples);
                 }
             }
+
+            final ProgressDialog pd = progressDialog;
+            final int progress = msg_current_received_bytes_number;
+            final int max_progress = msg_total_bytes_number_to_receive;
+            getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    int perc = progress/max_progress * 100;
+                    pd.setProgress(perc);
+                }
+            });
         }
 
 
@@ -556,14 +597,18 @@ public class BleDriver
             @Override
             public void run()
             {
-                Log.i("GUI thread", "GUI redrawed");
                 synchronized (text)
                 {
                     while (text.size() != 0)
                     {
                         String txt = text.poll();
                         if (txt != null)
-                            rxAsciiData.setText(rxAsciiData.getText() + txt + "\n");
+                        {
+                            asciiText += txt + "\n";
+//                            rxAsciiData.setText(rxAsciiData.getText() + txt + "\n");
+                            rxAsciiData.setText(asciiText);
+                        }
+
                     }
                 }
                 synchronized (rawData)
@@ -572,7 +617,11 @@ public class BleDriver
                     {
                         String raw = rawData.poll();
                         if (raw != null)
-                            rxRawData.setText(rxRawData.getText() + raw + "\n");
+                        {
+//                            rxRawData.setText(rxRawData.getText() + raw + "\n");
+                            rawText += raw + "\n";
+                            rxRawData.setText(rawText);
+                        }
                     }
                 }
             }

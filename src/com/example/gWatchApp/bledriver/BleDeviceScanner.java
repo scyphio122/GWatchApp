@@ -65,7 +65,7 @@ public class BleDeviceScanner
         this.activity = activity;
     }
 
-    public void startScanning(final boolean enable)
+    public void startStopScanning(final boolean enable)
     {
         if(enable)
         {
