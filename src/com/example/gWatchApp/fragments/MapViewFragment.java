@@ -48,6 +48,11 @@ public class MapViewFragment extends Fragment
         bleDriver.setMap(map);
 
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        map.getUiSettings().setZoomControlsEnabled(true);
+        map.getUiSettings().setCompassEnabled(true);
+        map.getUiSettings().setMyLocationButtonEnabled(true);
+        map.getUiSettings().setAllGesturesEnabled(true);
 //        map.addMarker(new MarkerOptions().position(new LatLng(52.201487, 20.998095)));
         return v;
     }
