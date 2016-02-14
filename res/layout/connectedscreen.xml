@@ -28,6 +28,23 @@
             <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="Stop Sampling" android:id="@+id/stopSamplingButton" android:layout_row="5"
                     android:layout_column="0" android:layout_weight="0.09"/>
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="86dp" android:layout_gravity="center_horizontal">
+                <EditText
+                        android:layout_width="75dp"
+                        android:layout_height="fill_parent"
+                        android:inputType="number"
+                        android:ems="10"
+                        android:id="@+id/storageIntervalLineEdit" android:text="15" android:editable="true"
+                        android:textAlignment="center"/>
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:text="Set Storage Interval"
+                        android:id="@+id/storageIntervalButton"/>
+            </LinearLayout>
             <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="Get Track List" android:id="@+id/trackListButton" android:layout_row="3"
                     android:layout_column="0"/>
@@ -70,8 +87,8 @@
         <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
-                android:layout_weight="0.01">
+                android:layout_height="0dp" android:layout_gravity="center_horizontal"
+                android:layout_weight="0.1">
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -85,38 +102,38 @@
         </LinearLayout>
         <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Wysłano:"
-                android:id="@+id/sentTextFtield" android:layout_weight="0.01"/>
+                android:id="@+id/sentTextFtield" android:layout_weight="0.04"/>
         <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:id="@+id/sentDataTextField" android:layout_weight="0.01"/>
+                android:id="@+id/sentDataTextField" android:layout_weight="0.04"/>
         <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Odebrano:"
-                android:id="@+id/receivedTextFrame" android:layout_weight="0.02"/>
+                android:id="@+id/receivedTextFrame" android:layout_weight="0.04"/>
         <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/scrollView2" android:layout_gravity="center_horizontal" android:layout_weight="0.48">
+                android:layout_height="0dp"
+                android:id="@+id/scrollView2" android:layout_gravity="center_horizontal" android:layout_weight="0.39">
             <TextView
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:id="@+id/receivedASCIIDataTextFrame"/>
         </ScrollView>
         <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/scrollView3" android:layout_gravity="center_horizontal" android:layout_weight="0.48">
+                android:layout_height="0dp"
+                android:id="@+id/scrollView3" android:layout_gravity="center_horizontal" android:layout_weight="0.39">
             <TextView
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:id="@+id/receivedRawDataTextField"/>
         </ScrollView>

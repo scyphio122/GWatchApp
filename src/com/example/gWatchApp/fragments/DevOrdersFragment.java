@@ -32,6 +32,8 @@ public class DevOrdersFragment extends Fragment implements View.OnClickListener
     Button  clearMemoryButton;
     Button  getDeviceTimeButton;
     Button  setDeviceTimeButton;
+    Button  storageIntervalButton;
+    EditText storageIntervalEditText;
     Switch  gpsOnOffSwitch;
     NumberPicker trackNumberPicker;
 
@@ -62,6 +64,11 @@ public class DevOrdersFragment extends Fragment implements View.OnClickListener
 
         getSatsUsedButton = (Button)view.findViewById(R.id.satsUsedButton);
         getSatsUsedButton.setOnClickListener(this);
+
+        storageIntervalButton = (Button)view.findViewById(R.id.storageIntervalButton);
+        storageIntervalButton.setOnClickListener(this);
+
+        storageIntervalEditText = (EditText)view.findViewById(R.id.storageIntervalLineEdit);
 
         getGpsFixButton = (Button)view.findViewById(R.id.gpsFixButton);
         getGpsFixButton.setOnClickListener(this);
@@ -222,6 +229,24 @@ public class DevOrdersFragment extends Fragment implements View.OnClickListener
                 data[4] = (byte)((time >> 24) & 0xFF);
 
                 bleDriver.sendData(data);
+                break;
+            }
+
+            case R.id.storageIntervalButton:
+            {
+                String storageInterval = this.storageIntervalEditText.getText().toString();
+                if(!storageInterval.isEmpty() && !storageInterval.equals("0"))
+                {
+                    int interval = new Integer(storageInterval).intValue();
+                    byte data[] = new byte[5];
+                    data[0] = 15;
+                    data[1] = (byte)(interval & 0xFF);
+                    data[2] = (byte)((interval >> 8 ) & 0xFF);
+                    data[3] = (byte)((interval >> 16) & 0xFF);
+                    data[4] = (byte)((interval >> 24) & 0xFF);
+
+                    bleDriver.sendData(data);
+                }
                 break;
             }
         }
