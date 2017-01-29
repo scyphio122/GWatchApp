@@ -285,6 +285,7 @@ public class BleDriver
             case 5:
             {
                 parseTrack(data);
+                redrawGUI(rxAsciiData, rxRawData);
                 break;
             }
             case 6:
@@ -581,7 +582,7 @@ public class BleDriver
                             .receivedASCIIDataTextFrame);
                     TextView rxRawData = (TextView)getActivity().getVpPager().findViewById(R.id
                             .receivedRawDataTextField);
-                    redrawGUI(rxAsciiData, rxRawData);
+
                     mapViewFragment.drawOnMap(this.gpsSamples, this.map);
                 }
                 else
@@ -625,7 +626,7 @@ public class BleDriver
                         if (txt != null)
                         {
                             asciiText += txt + "\n";
-//                            rxAsciiData.setText(rxAsciiData.getText() + txt + "\n");
+                            rxAsciiData.setText(txt);
                             rxAsciiData.setText(asciiText);
                         }
 
@@ -638,9 +639,9 @@ public class BleDriver
                         String raw = rawData.poll();
                         if (raw != null)
                         {
-//                            rxRawData.setText(rxRawData.getText() + raw + "\n");
                             rawText += raw + "\n";
-                            rxRawData.setText(rawText);
+                            rxRawData.setText(rawText + "\n");
+//                            rxRawData.setText(rawText);
                         }
                     }
                 }
